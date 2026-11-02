@@ -364,6 +364,7 @@ button{cursor:pointer}
 .opt-b[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#1a1205}
 .opt-none{font-size:11.5px;color:var(--muted);margin:-2px 0 10px;letter-spacing:.01em}
 .ex.is-b .ex-name::after{content:"Opción B";display:inline-block;margin-left:8px;font:700 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:3px 5px;vertical-align:middle}
+.next li span{white-space:nowrap}
 .has-b{font-style:normal;font-size:10px;font-weight:700;color:var(--accent);margin-left:4px}
 .rp-opt{font-style:normal;font-size:10px;color:#ff8a3d;text-transform:uppercase;letter-spacing:.06em}
 .scale .lab small{font-weight:500;text-transform:none;letter-spacing:0}
@@ -497,12 +498,7 @@ function tRir(ex, s){
 }
 function targetTxt(ex, s){
   const r = tRir(ex, s);
-  if (r == null || /RIR|fallo/i.test(s.target)) return s.target;
-  return `${s.target} · ${resTxt(r)}`;
-}
-/* "RIR 2" dicho en sencillo: cuántas repeticiones te tienen que quedar en el tanque */
-function resTxt(r){
-  return r === "0" ? "al fallo" : r === "1" ? "que te quede 1 rep" : r === "+2" ? "que te queden 2 o más reps" : `que te queden ${r} reps`;
+  return s.target;
 }
 /* RPE que marca el atleta -> RIR aproximado (RPE 9 ≈ RIR 1) y comparación con lo pautado */
 function rpeRead(rpe, tr){
@@ -572,7 +568,7 @@ function renderLogin(){
   });
 }
 
-let view = "home", hist = [], progEx = null, progMetric = "top", crea = {}, creaMonth = 0, creaOpen = false;
+let view = "home", hist = [], progEx = null, progMetric = "top";
 
 function login(c){
   code = c; store.set("ce-code", c);
@@ -584,7 +580,6 @@ function login(c){
     hist = hist.filter(e => !e.seed && !e.imported).concat(seedHistory(c)).sort((a,b) => a.ts - b.ts);
     saveHist(); store.set("ce-seedver-" + c, ver);
   }
-  crea = store.get("ce-crea-" + c) || {};
   mySetup = store.get("ce-setup-" + c) || {};
   view = "home";
   render();
@@ -939,22 +934,12 @@ function updateBar(){
 
 /* ---------- Inicio ---------- */
 const dayKey = d => { const x = new Date(d); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`; };
-function creaStreak(){
-  let n = 0; const d = new Date();
-  if (!crea[dayKey(d)]) d.setDate(d.getDate() - 1); // si hoy aún no, cuenta desde ayer
-  while (crea[dayKey(d)]) { n++; d.setDate(d.getDate() - 1); }
-  return n;
-}
 function renderHome(){
-  const cl = CLIENTS[code], now = new Date(), tk = dayKey(now), took = !!crea[tk];
+  const cl = CLIENTS[code], now = new Date();
   const h = now.getHours(), greet = h < 13 ? "Buenos días" : h < 20 ? "Buenas tardes" : "Buenas noches";
   let today = now.toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long"});
   today = today.charAt(0).toUpperCase() + today.slice(1);
 
-  const days7 = Array.from({length:7}, (_,i) => { const d = new Date(now); d.setDate(d.getDate() - (6 - i)); return d; });
-  const week = days7.map(d => { const k = dayKey(d), on = !!crea[k];
-    return `<div class="d7${on?" on":""}${k===tk?" now":""}"><i>${on?"✓":""}</i>${d.toLocaleDateString("es-ES",{weekday:"short"}).replace(".","").slice(0,2)}</div>`; }).join("");
-  const st = creaStreak();
 
   // Próximo entreno: el día que toca después del último guardado
   const lastE = hist.length ? hist.reduce((a,b) => b.ts > a.ts ? b : a) : null;
@@ -974,23 +959,14 @@ function renderHome(){
     <div class="welcome">
       <div class="today">${esc(today)}</div>
       <h2>${greet},<br><span>${esc(cl.name)}</span></h2>
-      <p>${took ? "Creatina hecha. Ahora toca darle duro." : "Marca tu creatina y vamos a entrenar."}</p>
+      <p>Tu rutina está lista. Cuando quieras, a entrenar.</p>
     </div>
-
-    <div class="blk-title">Check-in de hoy</div>
-    <button class="checkin" id="crea" aria-pressed="${took}">
-      <span class="box" aria-hidden="true">✓</span>
-      <span><span class="ci-t">¿Tomaste la creatina hoy?</span><br><span class="ci-s">${took ? "Registrado. Toca de nuevo si te equivocaste." : "Toca el cuadrito para marcarlo"}</span></span>
-      <span class="ok" aria-hidden="true">OK</span>
-    </button>
-    <div class="week7" aria-label="Creatina últimos 7 días">${week}</div>
-    <div class="streak">${st > 1 ? `Racha: <b>${st} días seguidos</b> 🔥` : st === 1 ? "Racha: <b>1 día</b>. ¡A por el segundo!" : "Empieza tu racha hoy."}</div>
 
     <div class="blk-title">Tu próximo entreno</div>
     <div class="next">
       <div><div class="n-day">${esc(nd.label)}</div><div class="n-meta">${lastTxt}</div></div>
       <div class="vibe">${vibe}</div>
-      <ul>${nd.exercises.map(ex => `<li>${esc(ex.name)}${ex.alt ? ` <em class="has-b">A/B</em>` : ""}<span>${(n => n + (n === 1 ? " serie" : " series"))(ex.sets.filter(s=>s.type!=="aprox").length)}</span></li>`).join("")}</ul>
+      <ul>${nd.exercises.map(ex => `<li><div>${esc(ex.name)}${ex.alt ? ` <em class="has-b">A/B</em>` : ""}</div><span>${(n => n + (n === 1 ? " serie" : " series"))(ex.sets.filter(s=>s.type!=="aprox").length)}</span></li>`).join("")}</ul>
       <button class="btn" id="go-train">Empezar entreno</button>
       ${others.length ? `<div class="alt">¿Hoy te viene mejor otro? ${others.map(x => `<button class="alt-b" data-i="${x.i}">${esc(x.d.label)}</button>`).join("")}</div>` : ""}
     </div>
@@ -998,41 +974,10 @@ function renderHome(){
   </section>`;
 
   wireHeader();
-  document.getElementById("crea").onclick = () => {
-    if (crea[tk]) delete crea[tk]; else crea[tk] = Date.now();
-    store.set("ce-crea-" + code, crea);
-    renderHome();
-  };
   document.getElementById("go-train").onclick = () => { dayIdx = ni; view = "train"; render(); window.scrollTo(0,0); };
   app.querySelectorAll(".alt-b").forEach(b => b.onclick = () => { dayIdx = +b.dataset.i; view = "train"; render(); window.scrollTo(0,0); });
 }
 
-/* ---------- Historial de creatina (pequeño, plegado) ---------- */
-function creaHistHTML(){
-  const now = new Date(), m = new Date(now.getFullYear(), now.getMonth() + creaMonth, 1);
-  const isCur = creaMonth === 0, dim = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
-  const upto = isCur ? now.getDate() : dim;
-  let count = 0; for (let d = 1; d <= upto; d++) if (crea[dayKey(new Date(m.getFullYear(), m.getMonth(), d))]) count++;
-  const pct = upto ? count / upto : 0;
-  const note = count === 0 ? (isCur ? "Este mes todavía no hay registros. Cuando la tomes, márcala en Inicio y aquí lo vamos viendo juntos." : "Este mes no hubo registros. Tranqui, lo importante es lo que viene.")
-    : pct >= .85 ? "¡Qué constancia! No esperaba menos de vos, ¡sos un crack! Seguí así 🧡"
-    : pct >= .5 ? "Vamos con todo 🔥 Venís muy bien, ¡a por más!"
-    : "Intenta no olvidarte, que cada día suma. ¡Seguimos!";
-  const offset = (m.getDay() + 6) % 7; // semana empieza en lunes
-  const cells = Array.from({length: offset}, () => `<span class="cm-e"></span>`).concat(
-    Array.from({length: dim}, (_,i) => { const d = new Date(m.getFullYear(), m.getMonth(), i+1), k = dayKey(d);
-      const fut = isCur && i+1 > now.getDate(), on = !!crea[k], today = isCur && i+1 === now.getDate();
-      return `<span class="cm-d${on?" on":""}${fut?" fut":""}${today?" now":""}" title="${i+1}">${i+1}</span>`; })).join("");
-  let mName = m.toLocaleDateString("es-ES", {month:"long", year:"numeric"}); mName = mName.charAt(0).toUpperCase() + mName.slice(1);
-  return `<details class="crea-h" id="crea-hist"${creaOpen ? " open" : ""}>
-    <summary><span>💊 Creatina</span><span class="crea-sum">${count} de ${upto} días ${isCur ? "este mes" : ""}</span></summary>
-    <div class="crea-body">
-      <div class="cm-nav"><button data-mv="-1" aria-label="Mes anterior">‹</button><b>${esc(mName)}</b><button data-mv="1" aria-label="Mes siguiente" ${isCur ? "disabled" : ""}>›</button></div>
-      <div class="cm">${["L","M","X","J","V","S","D"].map(x => `<span class="cm-h">${x}</span>`).join("")}${cells}</div>
-      <p class="crea-note">${note}<br><span>— Cristian</span></p>
-    </div>
-  </details>`;
-}
 
 /* ---------- Historial y progreso ---------- */
 function allExercises(){
@@ -1124,7 +1069,7 @@ function renderHistory(){
         <span class="s-date">${e.imported ? esc(e.week) + " · desde tu Excel" : esc(date) + " · " + done + "/" + tot + " series"}</span>
       </summary>
       <div class="sess-body">${e.exercises.map(ex => `<div><h4>${esc(ex.name)}</h4><table><thead><tr><th>Serie</th><th>Kg</th><th>Reps</th><th>RPE</th><th>Objetivo</th></tr></thead><tbody>${
-        ex.sets.map(s => `<tr><td>${TYPE_LABEL[s.type]}</td>${s.kgL !== undefined ? cell(hasVal(s.kg) || hasVal(s.kgL) ? `D ${hasVal(s.kg) ? fmt(s.kg) : "—"} / I ${hasVal(s.kgL) ? fmt(s.kgL) : "—"}` : "") : cell(s.kg === "" ? "" : fmt(s.kg))}${s.kgL !== undefined ? cell(hasVal(s.reps) || hasVal(s.repsL) ? `${s.reps || "—"} / ${s.repsL || "—"}` : "") : cell(s.reps)}${cell(s.rpe)}${cell(s.tRir != null ? (s.tRir === "0" ? "Fallo" : "Quedan " + s.tRir) : "")}</tr>`).join("")}</tbody></table></div>`).join("")}
+        ex.sets.map(s => `<tr><td>${TYPE_LABEL[s.type]}</td>${s.kgL !== undefined ? cell(hasVal(s.kg) || hasVal(s.kgL) ? `D ${hasVal(s.kg) ? fmt(s.kg) : "—"} / I ${hasVal(s.kgL) ? fmt(s.kgL) : "—"}` : "") : cell(s.kg === "" ? "" : fmt(s.kg))}${s.kgL !== undefined ? cell(hasVal(s.reps) || hasVal(s.repsL) ? `${s.reps || "—"} / ${s.repsL || "—"}` : "") : cell(s.reps)}${cell(s.rpe)}${cell(s.tRir != null ? (s.tRir === "0" ? "Fallo" : "RIR " + s.tRir) : "")}</tr>`).join("")}</tbody></table></div>`).join("")}
         ${e.imported ? "" : `<div class="s-del" data-sid="${esc(String(e.id || e.ts))}"><button class="s-del-b" data-del="ask">Borrar esta sesión</button></div>`}
       </div></details>`;
   }).join("") : `<div class="empty">Aún no has guardado ninguna sesión.</div>`;
@@ -1136,7 +1081,6 @@ function renderHistory(){
     <div class="picker">${names.map(n => `<button class="pick" data-ex="${esc(n)}" aria-pressed="${n===progEx}">${esc(n)}</button>`).join("")}</div>
     ${card}
   </section>
-  ${creaHistHTML()}
   <section class="h-sec">
     <h2 class="h-title">Sesiones</h2>
     ${sessHTML}
@@ -1146,11 +1090,6 @@ function renderHistory(){
 
   wireHeader();
   app.querySelectorAll(".pick").forEach(b => b.onclick = () => { progEx = b.dataset.ex; renderHistory(); });
-  const cd = document.getElementById("crea-hist");
-  if (cd){
-    cd.addEventListener("toggle", () => { creaOpen = cd.open; });
-    cd.querySelectorAll("[data-mv]").forEach(b => b.onclick = () => { creaMonth = Math.min(0, creaMonth + +b.dataset.mv); creaOpen = true; renderHistory(); });
-  }
   app.querySelectorAll(".metric button").forEach(b => b.onclick = () => { progMetric = b.dataset.m; renderHistory(); });
   app.querySelectorAll(".s-del").forEach(box => box.addEventListener("click", ev => {
     const b = ev.target.closest("[data-del]"); if (!b) return;
@@ -1230,7 +1169,7 @@ function showSummary(){
       const c = (x, r) => x === undefined || x === null || x === "" ? `<td class="miss r">—</td>` : `<td class="r">${esc(x)}</td>`;
       const kgv = ex.uni ? (hasVal(v.kg) || hasVal(v.kgL) ? `D ${hasVal(v.kg) ? fmt(+v.kg) : "—"} / I ${hasVal(v.kgL) ? fmt(+v.kgL) : "—"}` : "") : (v.kg == null || v.kg === "" ? "" : fmt(+v.kg));
       const repv = ex.uni ? (hasVal(v.reps) || hasVal(v.repsL) ? `${v.reps || "—"} / ${v.repsL || "—"}` : "") : v.reps;
-      return `<tr${has ? "" : ` class="skip"`}><td><span class="rp-t ${s.type}">${TYPE_LABEL[s.type]}${o.extra ? " +" : ""}</span></td>${c(kgv)}${c(repv)}${c(v.rpe)}${c(tr != null ? (tr === "0" ? "Fallo" : "Quedan " + tr) : "")}${rd ? `<td class="r"><span class="rp-pill ${rd.cls}">${esc(rd.txt)}</span></td>` : `<td class="miss r">—</td>`}</tr>`; }).join("")
+      return `<tr${has ? "" : ` class="skip"`}><td><span class="rp-t ${s.type}">${TYPE_LABEL[s.type]}${o.extra ? " +" : ""}</span></td>${c(kgv)}${c(repv)}${c(v.rpe)}${c(tr != null ? (tr === "0" ? "Fallo" : "RIR " + tr) : "")}${rd ? `<td class="r"><span class="rp-pill ${rd.cls}">${esc(rd.txt)}</span></td>` : `<td class="miss r">—</td>`}</tr>`; }).join("")
   }</tbody></table></section>`).join("");
   const warmDone = !!log[day.id + "-warm"], hasWarm = !!(day.warm && day.warm.length);
   const progHTML = FB.length ? `<div class="rp-prog"><div class="rp-h">Progreso · top set vs. última vez</div>${FB.map(x => `<div class="rp-pr ${x.cls}"><span>${esc(x.name)}</span><em>${esc(x.badge)}</em></div>`).join("")}</div>` : "";
@@ -1257,7 +1196,7 @@ function showSummary(){
         ${progHTML}
         ${tables}
         <div class="rp-foot">
-          <div><b>Objetivo</b> = reps que te tenían que quedar en el tanque. <b>Lectura</b> = reps que te quedaban según el esfuerzo (RPE) que marcaste: ✓ en objetivo · suave = te sobraron reps · pasado = más duro de lo pautado.</div>
+          <div><b>Objetivo</b> = RIR pautado por Cristian. <b>Lectura</b> = reps que te quedaban según el esfuerzo (RPE) que marcaste: ✓ en objetivo · suave = te sobraron reps · pasado = más duro de lo pautado.</div>
           <div>Volumen sin contar aproximaciones · CristianEntrenador</div>
         </div>
       </div>
@@ -1285,7 +1224,7 @@ function showSummary(){
         const has = [v.kg, v.reps, v.kgL, v.repsL].some(hasVal);
         if (!has && v.rpe == null){ L.push(`- ${TYPE_LABEL[st.type]}${o.extra ? " extra" : ""}: sin registrar`); return; }
         const kgr = has ? kgx(v, ex.uni) : "sin kg/reps";
-        L.push(`- ${TYPE_LABEL[st.type]}${o.extra ? " extra" : ""}: ${kgr}${v.rpe != null ? ` · RPE ${v.rpe}` : ""}${tr != null ? ` (objetivo: ${resTxt(tr)}${rd ? ` → ${rd.txt}` : ""})` : ""}${v.done ? "" : " · no marcada"}`);
+        L.push(`- ${TYPE_LABEL[st.type]}${o.extra ? " extra" : ""}: ${kgr}${v.rpe != null ? ` · RPE ${v.rpe}` : ""}${tr != null ? ` (RIR ${tr}${rd ? ` → ${rd.txt}` : ""})` : ""}${v.done ? "" : " · no marcada"}`);
       });
     });
     if (FB.length){ L.push("", "PROGRESO (top set vs. última vez)"); FB.forEach(x => L.push(`${{up:"✅",new:"⭐",same:"➖",mid:"🔸"}[x.cls]} ${x.name}: ${x.badge}`)); }
