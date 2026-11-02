@@ -146,7 +146,7 @@ button{cursor:pointer}
 .short.wide{max-width:100%;aspect-ratio:16/9}
 .v-lab{font-size:12px;color:var(--fg);font-weight:600;align-self:flex-start}
 .warm-t a{color:var(--muted);text-decoration:underline;text-decoration-color:rgba(151,160,198,.4);text-underline-offset:2px}
-.m-photo{width:100%;max-width:320px;border-radius:14px;display:block}
+.m-photo{width:100%;max-width:340px;border-radius:14px;display:block;margin:0 auto;background:#fff}
 
 /* ---------- Pestañas Entrenar / Historial ---------- */
 .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--surface);border-radius:12px;padding:4px;gap:4px}
@@ -382,71 +382,71 @@ button{cursor:pointer}
 /* ---------- Clientes ----------
    Cada ejercicio tiene su opción A y, si existe, su opción B (alt) por si la máquina está ocupada.
    La opción B hereda el vídeo de la A (mismo patrón de movimiento) salvo que se indique otro.
-   prev = lo que hizo la semana anterior (kg×reps). drive = id de la foto de la máquina en Google Drive. */
+   prev = lo que hizo la semana anterior (kg×reps). img = foto de la máquina (carpeta fotos/). */
 const CLIENTS = {
   /* ---------- Jesús · rutina de Noviembre S1; "última vez" = Octubre S4 (solo opción A) ---------- */
   "418263": {
     name: "Jesús", block: "Noviembre · Semana 1", seedVer: 1, lastWeek: "Octubre · Semana 4",
     days: [
       { id:"U1", label:"Día 1 · Upper A", cool:[{n:"Cinta con la inclinación al máximo", t:"10 min"}], exercises:[
-        { name:"Abdominales crunch en máquina", drive:"1ILPzXdU-YiDpczCkqExI-bG6xRTEU7rH", video:"b6ONE9Rfgl8", rir:"2", cues:[], sets:[
+        { name:"Abdominales crunch en máquina", img:"fotos/abdominales-crunch.jpg", video:"b6ONE9Rfgl8", rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps", prev:"54×15"},
           {type:"bo", target:"12 reps", prev:"54×15"},
           {type:"bo2", target:"12 reps", prev:"54×15"} ],
-          alt:{ name:"Abs crunch", sets:[
+          alt:{ name:"Abs crunch", img:null, sets:[
             {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"}, {type:"bo2", target:"12 reps"} ]}},
-        { name:"Press plano en máquina de placas (al lado de los baños)", drive:"1vY0C4QcgyT8XCKBFKxzFy8Kqpai64mfo", video:"2awX3rTGa1k", rir:"2", cues:[], sets:[
+        { name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", video:"2awX3rTGa1k", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"43×15"},
           {type:"bo", target:"10 reps", prev:"43×17"} ],
-          alt:{ name:"Press plano en máquina de placas (al lado de los aductores)", drive:"1TGZYkcAuR1cryHIMltp-UBRzXSK8zJND", sets:[
+          alt:{ name:"Press plano en máquina de placas (al lado de los aductores)", img:"fotos/press-plano-aductores.jpg", sets:[
             {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
-        { name:"Press inclinado en máquina de placas", drive:"1HjzyOjhrSd1H2OUOZDDlTQ6-1ugoZwvw", video:"Amvr9w2skr4", rir:"2", cues:[], sets:[
+        { name:"Press inclinado en máquina de placas", img:"fotos/press-inclinado-placas.jpg", video:"Amvr9w2skr4", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"29×12"},
           {type:"bo", target:"10 reps", prev:"29×12"} ]},
         { name:"Vuelos laterales", video:"ti5hxR7kB10", rir:"2", cues:[], sets:[
           {type:"top", target:"12–15 reps", prev:"4×15"},
           {type:"bo", target:"12–15 reps", prev:"4×20"} ]},
-        { name:"Peck fly", drive:"1ODWLQ91DsilYuRVPTyV4gKmmrO0IAf4N", video:"a9vQ_hwIksU", rir:"2", cues:[], sets:[
+        { name:"Peck fly", img:"fotos/peck-fly.jpg", video:"a9vQ_hwIksU", rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps", prev:"45×15"},
           {type:"bo", target:"12 reps", prev:"45×15"} ],
-          alt:{ name:"Peck fly (máquina al lado de los baños)", drive:"1-AGUfwJwA1QWUeoMg-pFZvbAML3YMx4-", sets:[
+          alt:{ name:"Peck fly (máquina al lado de los baños)", img:"fotos/peck-fly-banos.jpg", sets:[
             {type:"top", target:"12–15 reps"}, {type:"bo", target:"12–15 reps"} ]}},
-        { name:"Jalón al pecho en polea", drive:"1uoJSWBZWd2P9NJHKVn_QpQMN2GXq4I2D", video:"sAYU5EvtXSo", rir:"2", cues:[], sets:[
+        { name:"Jalón al pecho en polea", img:"fotos/jalon-polea.jpg", video:"sAYU5EvtXSo", rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps", prev:"41×10"},
           {type:"bo", target:"10 reps", prev:"41×10"} ],
-          alt:{ name:"Jalón al pecho en polea (cerca de los baños)", drive:null, sets:[
+          alt:{ name:"Jalón al pecho en polea (al lado de los baños)", sets:[
             {type:"top", target:"12 reps"}, {type:"bo", target:"10 reps"} ]}},
-        { name:"Remo en máquina de placas y polea", drive:"1s-qN1OU4mo6DqHCgZdZ0GdbM_zcXQVc9", video:"mOpmtLusBBM", rir:"2", cues:[], sets:[
+        { name:"Remo en máquina de placas y polea", img:"fotos/remo-placas-polea.jpg", video:"mOpmtLusBBM", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"36×15"},
           {type:"bo", target:"10 reps", prev:"36×15"} ],
-          alt:{ name:"Remo en máquina de placas (zona de circuitos)", drive:"13Y7TGW23lkOIsNhCa9xmXjCIn-QgVG7h", sets:[
+          alt:{ name:"Remo en máquina de placas (zona de circuitos)", img:"fotos/remo-placas-circuitos.jpg", sets:[
             {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}}
       ]},
       { id:"L1", label:"Día 2 · Legday A", exercises:[
-        { name:"Extensión de cuádriceps con respaldo", drive:"1YgAfbd7p3_TmnaRHD067_gAen2Rvi7Pz", video:"RRxao7N3pSw", setup:"Respaldo 7 / 12 / 4", rir:"2", cues:[], sets:[
+        { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"RRxao7N3pSw", setup:"Respaldo 7 / 12 / 4", rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps", prev:"77×15"},
           {type:"bo", target:"12 reps", prev:"84×15"} ],
-          alt:{ name:"Extensión de cuádriceps sin respaldo", drive:"1vi9_HCbgLOalouWBFMMeWZ7Wpn_xSOZn", setup:null, sets:[
+          alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", setup:null, sets:[
             {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ]}},
-        { name:"Hack squat", drive:"15fNdBcv-SgS9XjpJnLCnqzuJAcrRu7Zh", video:"rYgNArpwE7E", wide:true, rir:"2", cues:[], sets:[
+        { name:"Hack squat", img:"fotos/hack-squat.jpg", video:"rYgNArpwE7E", wide:true, rir:"2", cues:[], sets:[
           {type:"top", target:"6 reps", prev:"10×12"},
           {type:"bo", target:"8 reps", prev:"10×12"} ],
           alt:{ name:"Hack squat", sets:[
             {type:"top", target:"6 reps"}, {type:"bo", target:"8 reps"} ]}},
-        { name:"Prensa inclinada", drive:"1VQiLv7VqyvSS3WSWtmrDb5gi57Dq50CE", video:"VztOTDLqs7w", setup:"Banco a 10°, máximo estiramiento", rir:"2", cues:[], sets:[
+        { name:"Prensa inclinada", img:"fotos/prensa-inclinada.jpg", video:"VztOTDLqs7w", setup:"Banco a 10°, máximo estiramiento", rir:"2", cues:[], sets:[
           {type:"top", target:"7 reps", prev:"60×12"},
           {type:"bo", target:"10 reps", prev:"60×13"} ],
           alt:{ name:"Prensa inclinada", sets:[
             {type:"top", target:"7 reps"}, {type:"bo", target:"10 reps"} ]}},
-        { name:"Extensión lumbar", drive:"13Bh1BLRPOSIl3Lmd1cxA8lCbEUWA1Od2", video:"_lrQxyQd7A8", setup:"Nivel 3", rir:"2", cues:[], sets:[
+        { name:"Extensión lumbar", img:"fotos/extension-lumbar.jpg", video:"_lrQxyQd7A8", setup:"Nivel 3", rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps", prev:"0×11"},
           {type:"bo", target:"12 reps", prev:"0×12"} ],
           alt:{ name:"Extensión lumbar", sets:[
             {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ]}},
-        { name:"Curl femoral sentado con respaldo", drive:"1bi-uqwPRc2zFvrI-0z_Z_grFB0LsbZ36", video:"6IvQvWZmEsw", setup:"Asiento 7, rodillo 4", rir:"2", cues:[], sets:[
+        { name:"Curl femoral sentado con respaldo", img:"fotos/curl-femoral-respaldo.jpg", video:"6IvQvWZmEsw", setup:"Asiento 7, rodillo 4", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"84×15"},
           {type:"bo", target:"10 reps"} ],
-          alt:{ name:"Curl femoral sentado sin respaldo", drive:"19yI48sT1opoEZ511BQ9rqv4yamQpgOUW", setup:null, sets:[
+          alt:{ name:"Curl femoral sentado sin respaldo", img:"fotos/curl-femoral-sin-respaldo.jpg", setup:null, sets:[
             {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
         { name:"RDL", video:"0XL4cZR2Ink", wide:true, rir:"2", cues:[], sets:[
           {type:"top", target:"6 reps"},
@@ -468,9 +468,9 @@ const CLIENTS = {
         { name:"Remo en T, agarre amplio y prono", video:"udi--2PLXAQ", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"20×10"},
           {type:"bo", target:"10 reps", prev:"20×11"} ],
-          alt:{ name:"Remo en T con mancuernas", sets:[
+          alt:{ name:"Remo en T con mancuernas", img:null, sets:[
             {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
-        { name:"Fondos en máquina de placas", drive:"184VC5B77LDp7DHD7ejIT0zA7jHi-i_yS", video:"gUHLi_SM6IE", rir:"2", cues:[], sets:[
+        { name:"Fondos en máquina de placas", img:"fotos/fondos-placas.jpg", video:"gUHLi_SM6IE", rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps", prev:"50×12"},
           {type:"bo", target:"12 reps", prev:"50×12"} ],
           alt:{ name:"Fondos en máquina de placas (zona de circuitos)", sets:[
@@ -753,10 +753,8 @@ function warmHTML(day, kind = "warm"){
     <button class="warm-ok" data-kind="${kind}" aria-pressed="${on}">${on ? "✓ Okay" : "Okay"}</button>
   </div>`;
 }
-const driveImg = id => `https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=w900`;
-const driveView = id => `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`;
 function mediaHTML(ex, id){
-  const pSrc = ex.drive ? driveImg(ex.drive) : (ex.photo && PHOTOS[ex.photo]), hasP = !!pSrc, hasV = !!(ex.video || ex.loom);
+  const pSrc = ex.img || (ex.photo && PHOTOS[ex.photo]), hasP = !!pSrc, hasV = !!(ex.video || ex.loom);
   const ref = ex.ref ? `<a class="yt-link" href="${esc(ex.ref.url)}" target="_blank" rel="noopener">📎 ${esc(ex.ref.label)} ↗</a>` : "";
   if (!hasP && !hasV) return ref ? `<div class="media">${ref}</div>` : `<div class="vid">Aquí irá tu foto y vídeo del ejercicio</div>`;
   const first = hasP ? "p" : "v";
@@ -772,7 +770,7 @@ function mediaHTML(ex, id){
     ${hasP && hasV ? `<div class="m-tabs"><button class="m-tab" data-m="v" aria-pressed="${first==="v"}">▶ Vídeo</button><button class="m-tab" data-m="p" aria-pressed="${first==="p"}">📷 Máquina</button></div>` : ""}
     ${hasV ? `<div class="m-pane" data-pane="v"${first==="v"?"":" hidden"}>${ex.vlabel ? `<div class="v-lab">${esc(ex.vlabel)}</div>` : ""}<div class="short${wide ? " wide" : ""}" data-src="${esc(vSrc)}"></div>
       <a class="yt-link" href="${esc(vOpen)}" target="_blank" rel="noopener">¿No carga? Ábrelo ${ex.loom ? "en Loom" : "en YouTube"} ↗</a>${ref}</div>` : ""}
-    ${hasP ? `<div class="m-pane" data-pane="p"${first==="p"?"":" hidden"}><img class="m-photo" src="${esc(pSrc)}" alt="Máquina de ${esc(ex.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.nextElementSibling.hidden=false">${ex.drive ? `<a class="yt-link" hidden href="${esc(driveView(ex.drive))}" target="_blank" rel="noopener">📷 Ver la foto de la máquina ↗</a>` : ""}</div>` : ""}
+    ${hasP ? `<div class="m-pane" data-pane="p"${first==="p"?"":" hidden"}><img class="m-photo" src="${esc(pSrc)}" alt="Máquina de ${esc(ex.name)}" loading="lazy"></div>` : ""}
   </div>`;
 }
 /* El vídeo solo se carga cuando se abre "Ver ejercicio" (ahorra datos) */
