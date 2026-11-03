@@ -806,10 +806,10 @@ const CLIENTS = {
     ]
   },
   /* ---------- Elisa · Noviembre S1; "última vez" = última semana de octubre (Excel "ult sem oct") ----------
-     Todo a RIR 2. Si la semana pasada hizo la otra máquina (press plano baños, cuádriceps con respaldo) el prev va en la B.
+     Todo a RIR 2. Excel: tabla izquierda = opción A, derecha = opción B (si es el mismo ejercicio, no hay B).
      Crunch: el Excel solo tiene kg; se toma ×10 (lo pautado). Búlgara unilateral: "8kgx10i10d". */
   "257238": {
-    name: "Elisa", block: "Noviembre · Semana 1", seedVer: 1, lastWeek: "Octubre · última semana",
+    name: "Elisa", block: "Noviembre · Semana 1", seedVer: 2, lastWeek: "Octubre · última semana",
     days: [
       { id:"U1", label:"Día 1 · Upper", coolTitle:"Para terminar",
         cool:[{n:"Plancha", t:"1 min"}], exercises:[
@@ -821,18 +821,16 @@ const CLIENTS = {
           {type:"top", target:"10 reps", prev:"4×12"},
           {type:"bo", target:"10 reps", prev:"4×12"},
           {type:"bo2", target:"10 reps", prev:"4×12"} ]},
-        { name:"Press plano en máquina de placas (al lado de los aductores)", img:"fotos/press-plano-aductores.jpg", video:"2awX3rTGa1k", rir:"2", cues:["Antes: 1 serie de aproximación de 3 reps", "Sube a 8 kg"], sets:[
-          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ],
-          alt:{ name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", sets:[
-            {type:"top", target:"10 reps", prev:"6×10"},
-            {type:"bo", target:"10 reps", prev:"6×10"} ]}},
+        { name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", video:"2awX3rTGa1k", rir:"2", cues:["Antes: 1 serie de aproximación de 3 reps", "Sube a 8 kg"], sets:[
+          {type:"top", target:"10 reps", prev:"6×10"},
+          {type:"bo", target:"10 reps", prev:"6×10"} ],
+          alt:{ name:"Press plano en máquina de placas (al lado de los aductores)", img:"fotos/press-plano-aductores.jpg", sets:[
+            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
         { name:"Fondos en máquina de placas", img:"fotos/fondos-placas.jpg", video:"gUHLi_SM6IE", rir:"2", cues:[], sets:[
           {type:"top", target:"7 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]},
         { name:"Jalón al pecho en máquina de placas (zona de circuitos)", img:"fotos/jalon-placas-circuitos.jpg", video:"VPIcgV_i0VQ", rir:"2", cues:["Antes: 1 serie de aproximación de 3 reps"], sets:[
           {type:"top", target:"10 reps", prev:"31×10"},
-          {type:"bo", target:"10 reps", prev:"31×10"} ],
-          alt:{ name:"Jalón al pecho en máquina de placas", img:"fotos/jalon-placas.jpg", sets:[
-            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
+          {type:"bo", target:"10 reps", prev:"31×10"} ]},
         { name:"Remo en máquina de placas (zona de circuitos)", img:"fotos/remo-placas-circuitos.jpg", video:"mOpmtLusBBM", rir:"2", cues:[], sets:[
           {type:"top", target:"7 reps", prev:"40×10"},
           {type:"bo", target:"9–12 reps", prev:"40×10"},
@@ -843,28 +841,22 @@ const CLIENTS = {
           {type:"bo2", target:"10 reps", prev:"20×10"} ]}
       ]},
       { id:"L1", label:"Día 2 · Legday", exercises:[
-        { name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", video:"RRxao7N3pSw", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
-          {type:"top", target:"12–15 reps"}, {type:"bo", target:"12–15 reps"}, {type:"bo2", target:"12–15 reps"} ],
-          alt:{ name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", sets:[
-            {type:"top", target:"12–15 reps", prev:"45×10"},
-            {type:"bo", target:"12–15 reps", prev:"45×10"},
-            {type:"bo2", target:"12–15 reps", prev:"45×10"} ]}},
+        { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"RRxao7N3pSw", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
+          {type:"top", target:"12–15 reps", prev:"45×10"},
+          {type:"bo", target:"12–15 reps", prev:"45×10"},
+          {type:"bo2", target:"12–15 reps", prev:"45×10"} ],
+          alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", sets:[
+            {type:"top", target:"12–15 reps"}, {type:"bo", target:"12–15 reps"}, {type:"bo2", target:"12–15 reps"} ]}},
         { name:"Hack squat", img:"fotos/hack-squat.jpg", video:"9E0oA25ZBlo", setup:"Peso = total de discos (sin la máquina)", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
           {type:"top", target:"8 reps", prev:"10×8"},
-          {type:"bo", target:"10 reps", prev:"10×8"} ],
-          alt:{ name:"Sentadilla goblet", img:null, setup:null, sets:[
-            {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"} ]}},
+          {type:"bo", target:"10 reps", prev:"10×8"} ]},
         { name:"Sentadilla búlgara con mancuernas", video:"t4-_udCqwqI", uni:true, rir:"2", cues:[], sets:[
-          {type:"top", target:"8 reps", prev:"8×10|8×10"} ],
-          alt:{ name:"Sentadilla búlgara en Smith", img:"fotos/smith.jpg", setup:"Peso = kg por lado de la barra", sets:[
-            {type:"top", target:"8 reps"} ]}},
+          {type:"top", target:"8 reps", prev:"8×10|8×10"} ]},
         { name:"Extensión lumbar", img:"fotos/extension-lumbar.jpg", video:"_lrQxyQd7A8", setup:"Nivel de asiento 6", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"10×10"},
           {type:"bo", target:"10 reps", prev:"10×10"} ]},
         { name:"Curl femoral tumbado", img:"fotos/curl-femoral-tumbado.jpg", video:"6IvQvWZmEsw", setup:"Rodillo 6", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
-          {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"} ],
-          alt:{ name:"Curl femoral sentado sin respaldo", img:"fotos/curl-femoral-sin-respaldo.jpg", setup:null, sets:[
-            {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"} ]}},
+          {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"} ]},
         { name:"Abductor en máquina", img:"fotos/abductor-aductor.jpg", video:"xlp6FYwBFLU", rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps", prev:"50×12"},
           {type:"bo", target:"12 reps", prev:"50×12"} ]},
