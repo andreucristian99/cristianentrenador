@@ -810,9 +810,9 @@ const CLIENTS = {
   },
   /* ---------- Elisa · Noviembre S1; "última vez" = última semana de octubre (Excel "ult sem oct") ----------
      Todo a RIR 2. Excel: tabla izquierda = opción A, derecha = opción B (si es el mismo ejercicio, no hay B).
-     Crunch: el Excel solo tiene kg; se toma ×10 (lo pautado). Búlgara unilateral: "8kgx10i10d". */
+     Crunch D1: A sin máquina (reps), B en máquina con los kg del D2. Búlgara unilateral: "8kgx10i10d". */
   "257238": {
-    name: "Elisa", block: "Noviembre · Semana 1", seedVer: 2, lastWeek: "Octubre · última semana",
+    name: "Elisa", block: "Noviembre · Semana 1", seedVer: 3, lastWeek: "Octubre · última semana",
     days: [
       { id:"U1", label:"Día 1 · Upper", coolTitle:"Para terminar",
         memo:["Remo en máquina de placas y poleas: 23 kg × 10 × 10 × 10", "Press francés: 4 kg × 10 × 10"],
@@ -839,10 +839,14 @@ const CLIENTS = {
           {type:"top", target:"7 reps", prev:"40×10"},
           {type:"bo", target:"9–12 reps", prev:"40×10"},
           {type:"bo2", target:"9–12 reps", prev:"40×10"} ]},
-        { name:"Abdominales crunch en máquina", img:"fotos/abdominales-crunch.jpg", video:"b6ONE9Rfgl8", rir:"2", cues:[], sets:[
-          {type:"top", target:"10 reps", prev:"15×10"},
-          {type:"bo", target:"10 reps", prev:"15×10"},
-          {type:"bo2", target:"10 reps", prev:"20×10"} ]}
+        { name:"Abs crunch", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps", prev:"0×15"},
+          {type:"bo", target:"10 reps", prev:"0×15"},
+          {type:"bo2", target:"10 reps", prev:"0×20"} ],
+          alt:{ name:"Abdominales crunch en máquina", img:"fotos/abdominales-crunch.jpg", video:"b6ONE9Rfgl8", sets:[
+            {type:"top", target:"10 reps", prev:"22,5×10"},
+            {type:"bo", target:"10 reps", prev:"27×10"},
+            {type:"bo2", target:"10 reps", prev:"27×10"} ]}}
       ]},
       { id:"L1", label:"Día 2 · Legday", exercises:[
         { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"RRxao7N3pSw", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
@@ -994,7 +998,7 @@ function seedHistory(c){
       const d = new Date(now); d.setDate(d.getDate() - (cl.days.length - di) * 2 - (wk !== cl.lastWeek ? 7 : 0)); d.setHours(18,30,0,0);
       out.push({ id:`imp-${day.id}-${cl.seedVer||0}`, ts:d.getTime(), dayId:day.id, dayLabel:day.label, imported:true, week:wk,
         /* Si la semana pasada hizo la opción B (prev cargado en la B), el registro va a nombre de la B */
-        exercises: day.exercises.map(ex0 => ex0.alt && ex0.alt.sets.some(s => s.prev) ? { ...ex0, ...ex0.alt } : ex0).map(ex => ({ name: ex.name, sets: ex.sets.map(s => {
+        exercises: day.exercises.map(ex0 => ex0.alt && ex0.alt.sets.some(s => s.prev) && !ex0.sets.some(s => s.prev) ? { ...ex0, ...ex0.alt } : ex0).map(ex => ({ name: ex.name, sets: ex.sets.map(s => {
           const [pr, pl] = String(s.prev || "").split("|"), p = parsePrev(pr), q = ex.uni ? parsePrev(pl || pr) : null;
           return { type:s.type, kg:p.ok ? String(p.kg) : "", reps:p.ok ? String(p.reps) : "", ...(q ? { kgL:q.kg ? String(q.kg) : "", repsL:q.reps ? String(q.reps) : "" } : {}),
             rpe:null, rir:null, tRir:tRir(ex, s), done:p.ok };
@@ -1049,6 +1053,13 @@ function lastFor(dayId, ei, type, ord, name){
     const ex = e.exercises[ei]; if (!ex || (name && ex.name !== name)) continue;
     const s = ex.sets.filter(x => x.type === type)[ord];
     if (s && s.done && ((s.kg !== "" && s.reps !== "") || (hasVal(s.kgL) && hasVal(s.repsL)))) return { ts: e.ts, kg: s.kg, reps: s.reps, kgL: s.kgL, repsL: s.repsL, rir: s.rir, rpe: s.rpe };
+  }
+  /* Si A y B traen "última vez" del Excel, el historial guarda la A; la B la saca de su prev */
+  const day = CLIENTS[code].days.find(d => d.id === dayId), ex0 = day && day.exercises[ei];
+  if (ex0 && ex0.alt && name && ex0.alt.name === name && ex0.sets.some(x => x.prev)){
+    const s = ex0.alt.sets.filter(x => x.type === type)[ord], p = s && s.prev ? parsePrev(s.prev) : null;
+    const imp = hist.find(e => e.imported && e.dayId === dayId);
+    if (p && p.ok) return { ts: imp ? imp.ts : Date.now(), kg: String(p.kg), reps: String(p.reps), rir: null, rpe: null };
   }
   return null;
 }
