@@ -76,6 +76,9 @@ button{cursor:pointer}
 .cues{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 .cues .vid{aspect-ratio:16/9;max-width:100%;border-radius:8px;border:1px dashed var(--line);display:grid;place-items:center;font-size:13px;margin-bottom:6px}
 .cues b{color:var(--fg)}
+/* Notas de Cristian en pequeño (ex.memo / day.memo) */
+.memo{font-size:11.5px;line-height:1.35;color:var(--muted);margin-top:4px}.memo b{color:var(--accent);font-weight:600}
+.day-memo{margin:0 0 10px;padding:8px 12px;border:1px dashed var(--line);border-radius:10px}
 
 .set{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
 .set-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
@@ -812,8 +815,9 @@ const CLIENTS = {
     name: "Elisa", block: "Noviembre · Semana 1", seedVer: 2, lastWeek: "Octubre · última semana",
     days: [
       { id:"U1", label:"Día 1 · Upper", coolTitle:"Para terminar",
+        memo:["Remo en máquina de placas y poleas: 23 kg × 10 × 10 × 10", "Press francés: 4 kg × 10 × 10"],
         cool:[{n:"Plancha", t:"1 min"}], exercises:[
-        { name:"Press militar en máquina de placas", img:"fotos/press-militar-placas.jpg", video:"oUDnqyu2ZIE", rir:"2", cues:["Antes: 1 serie de aproximación de 3 reps", "Primera serie: empieza con 22 kg"], sets:[
+        { name:"Press militar en máquina de placas", img:"fotos/press-militar-placas.jpg", video:"oUDnqyu2ZIE", rir:"2", cues:["Antes: 1 serie de aproximación de 3 reps"], memo:["Primera serie: empezar con 22 kg"], sets:[
           {type:"top", target:"6 reps", prev:"18×10"},
           {type:"bo", target:"8–10 reps", prev:"18×10"},
           {type:"bo2", target:"8–10 reps"} ]},
@@ -821,7 +825,7 @@ const CLIENTS = {
           {type:"top", target:"10 reps", prev:"4×12"},
           {type:"bo", target:"10 reps", prev:"4×12"},
           {type:"bo2", target:"10 reps", prev:"4×12"} ]},
-        { name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", video:"2awX3rTGa1k", rir:"2", cues:["Antes: 1 serie de aproximación de 3 reps", "Sube a 8 kg"], sets:[
+        { name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", video:"2awX3rTGa1k", rir:"2", cues:["Antes: 1 serie de aproximación de 3 reps"], memo:["Subir a 8 kg"], sets:[
           {type:"top", target:"10 reps", prev:"6×10"},
           {type:"bo", target:"10 reps", prev:"6×10"} ],
           alt:{ name:"Press plano en máquina de placas (al lado de los aductores)", img:"fotos/press-plano-aductores.jpg", sets:[
@@ -905,7 +909,7 @@ function optOf(day, ei){ return day.exercises[ei].alt && log[`${day.id}-${ei}-op
 function eff(day, ei){
   const ex = day.exercises[ei];
   if (optOf(day, ei) !== "B") return { ...ex, opt: ex.alt ? "A" : null };
-  return { ...ex, ...ex.alt, cues: ex.alt.cues || ex.cues, alt: undefined, opt: "B" };
+  return { ...ex, ...ex.alt, cues: ex.alt.cues || ex.cues, memo: ex.alt.memo || ex.memo, alt: undefined, opt: "B" };
 }
 const exs = day => day.exercises.map((_, ei) => eff(day, ei));
 const sfx = (day, ei) => optOf(day, ei) === "B" ? "b" : "";
@@ -1088,6 +1092,7 @@ function renderSession(){
     <div class="days">${cl.days.map((d,i)=>`<button class="day" data-day="${i}" aria-pressed="${i===dayIdx}">${esc(d.label)}</button>`).join("")}</div>
     <div class="progress"><i id="bar"></i></div>`) + `
   ${warmHTML(day)}
+  ${day.memo && day.memo.length ? `<div class="memo day-memo">${day.memo.map(m => `<div><b>Nota:</b> ${esc(m)}</div>`).join("")}</div>` : ""}
   <div class="ex-list">${exs(day).map((ex,ei)=>exCard(day,ex,ei)).join("")}</div>
   ${warmHTML(day, "cool")}
   <div class="finish-bar"><button class="btn" id="finish">Terminar sesión</button></div>`;
@@ -1238,7 +1243,7 @@ function exCard(day, ex, ei){
   return `<article class="ex${ex.opt === "B" ? " is-b" : ""}">
     ${optHTML(day, ex, ei)}
     <div class="ex-head">
-      <div><div class="ex-idx">${String(ei+1).padStart(2,"0")}</div><div class="ex-name">${esc(ex.name)}</div>${ex.meta ? `<div class="ex-meta">${esc(ex.meta)}</div>` : ""}${setupBlock(day, ex, ei)}</div>
+      <div><div class="ex-idx">${String(ei+1).padStart(2,"0")}</div><div class="ex-name">${esc(ex.name)}</div>${ex.meta ? `<div class="ex-meta">${esc(ex.meta)}</div>` : ""}${(ex.memo || []).map(m => `<div class="memo"><b>Nota:</b> ${esc(m)}</div>`).join("")}${setupBlock(day, ex, ei)}</div>
       <button class="see" aria-expanded="false" aria-controls="cue-${day.id}-${ei}">Ver ejercicio</button>
     </div>
     <div class="cues" id="cue-${day.id}-${ei}" hidden>
