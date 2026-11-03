@@ -358,6 +358,7 @@ button{cursor:pointer}
 .imgview p b{color:var(--accent)}
 .imgview img{width:100%;max-width:420px;border-radius:10px;display:block;-webkit-touch-callout:default;user-select:auto}
 .imgview .ghost{width:100%;max-width:420px;flex-shrink:0}
+.s-rep{width:100%;margin-top:10px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:800}
 .s-del{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .s-del-b{background:none;border:1px solid rgba(255,178,122,.4);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;color:var(--warn)}
 .s-del-q{flex:1 1 100%;margin:0;font-size:13px;color:var(--fg)}
@@ -1286,6 +1287,7 @@ function renderHistory(){
       </summary>
       <div class="sess-body">${e.exercises.map(ex => `<div><h4>${esc(ex.name)}</h4><table><thead><tr><th>Serie</th><th>Kg</th><th>Reps</th><th>RPE</th><th>Objetivo</th></tr></thead><tbody>${
         ex.sets.map(s => `<tr><td>${TYPE_LABEL[s.type]}</td>${s.kgL !== undefined ? cell(hasVal(s.kg) || hasVal(s.kgL) ? `D ${hasVal(s.kg) ? fmt(s.kg) : "—"} / I ${hasVal(s.kgL) ? fmt(s.kgL) : "—"}` : "") : cell(s.kg === "" ? "" : fmt(s.kg))}${s.kgL !== undefined ? cell(hasVal(s.reps) || hasVal(s.repsL) ? `${s.reps || "—"} / ${s.repsL || "—"}` : "") : cell(s.reps)}${cell(s.rpe)}${cell(s.tRir != null ? (s.tRir === "0" ? "Fallo" : "RIR " + s.tRir) : "")}</tr>`).join("")}</tbody></table>${ex.note ? `<p class="h-note">📝 ${esc(ex.note)}</p>` : ""}</div>`).join("")}
+        ${e.imported || e.seed ? "" : `<button class="s-rep" data-sid="${esc(String(e.id || e.ts))}">🖼️ Ver informe y compartir</button>`}
         ${e.imported ? "" : `<div class="s-del" data-sid="${esc(String(e.id || e.ts))}"><button class="s-del-b" data-del="ask">Borrar esta sesión</button></div>`}
       </div></details>`;
   }).join("") : `<div class="empty">Aún no has guardado ninguna sesión.</div>`;
@@ -1307,6 +1309,9 @@ function renderHistory(){
   wireHeader();
   app.querySelectorAll(".pick").forEach(b => b.onclick = () => { progEx = b.dataset.ex; renderHistory(); });
   app.querySelectorAll(".metric button").forEach(b => b.onclick = () => { progMetric = b.dataset.m; renderHistory(); });
+  app.querySelectorAll(".s-rep").forEach(b => b.onclick = () => {
+    const e = hist.find(x => String(x.id || x.ts) === b.dataset.sid); if (e) showSavedReport(e);
+  });
   app.querySelectorAll(".s-del").forEach(box => box.addEventListener("click", ev => {
     const b = ev.target.closest("[data-del]"); if (!b) return;
     const a = b.dataset.del, sid = box.dataset.sid;
@@ -1370,44 +1375,68 @@ function feedbackHTML(fb){
       <span class="fb-t"><b>${esc(x.name)}</b><small>${esc(x.note)}</small></span>
       <span class="fb-b">${esc(x.badge)}</span></div>`).join("")}<p class="fb-f">Comparado con tu top set de la última vez. — Cristian</p></div>`;
 }
-function showSummary(){
-  const cl = CLIENTS[code], day = cl.days[dayIdx];
-  const all = daySets(), done = all.filter(x => x.v.done);
-  const work = done.filter(x => x.s.type !== "aprox");
-  const vol = work.reduce((a,x) => a + setVol(x.v), 0);
-  const fmt = n => n.toLocaleString("es-ES", {maximumFractionDigits:1});
-  const date = new Date().toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long"});
-  const cell = v => v === undefined || v === null || v === "" ? `<td class="miss">—</td>` : `<td>${esc(v)}</td>`;
-  const FB = progressFeedback(day);
-  const tables = exs(day).map((ex,ei) => `<section class="rp-ex"><div class="rp-ex-h"><span class="rp-n">${String(ei+1).padStart(2,"0")}</span><h3>${esc(ex.name)}${ex.opt === "B" ? ` <em class="rp-opt">opción B</em>` : ""}</h3></div>${setupPdf(day, ex, ei)}<table><thead><tr><th>Serie</th><th class="r">Kg</th><th class="r">Reps</th><th class="r">RPE</th><th class="r">Objetivo</th><th class="r">Lectura</th></tr></thead><tbody>${
-    setsOf(day,ex,ei).map(o => { const s = o.s, v = log[o.k] || {}, tr = tRir(ex, s), rd = rpeRead(v.rpe, tr);
+/* El informe se arma siempre desde la sesión guardada en el historial:
+   así el de fin de sesión y el que se reabre desde Historial son el mismo. */
+const nf = n => n.toLocaleString("es-ES", {maximumFractionDigits:1});
+const longDate = ts => new Date(ts).toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long"});
+const entryUni = ex => ex.sets.some(s => s.kgL !== undefined);
+function entryFeedback(e){
+  if (e.fb) return e.fb;
+  // Sesiones antiguas: se calcula contra la sesión anterior del mismo día de rutina
+  const before = hist.filter(x => x.dayId === e.dayId && x.ts < e.ts && x !== e).sort((a,b) => a.ts - b.ts);
+  const dayDef = (CLIENTS[code].days.find(d => d.id === e.dayId) || {}).exercises || [];
+  const out = [];
+  e.exercises.forEach((ex, ei) => {
+    const v = ex.sets.find(s => s.type === "top"); if (!v) return;
+    let l = null;
+    for (let i = before.length - 1; i >= 0 && !l; i--){
+      const px = before[i].exercises[ei]; if (!px || px.name !== ex.name) continue;
+      const s = px.sets.filter(x => x.type === "top")[0];
+      if (s && s.done && ((s.kg !== "" && s.reps !== "") || (hasVal(s.kgL) && hasVal(s.repsL)))) l = s;
+    }
+    const def = dayDef[ei] ? (ex.opt === "B" && dayDef[ei].alt ? dayDef[ei].alt : dayDef[ei]) : null;
+    const ts0 = def ? def.sets.find(s => s.type === "top") : null;
+    const tmin = ts0 ? parseInt(String(ts0.target)) || null : null;
+    const sides = entryUni(ex) ? [["D","kg","reps"],["I","kgL","repsL"]] : [["","kg","reps"]];
+    const parts = sides.map(([lab, kf, rf]) => {
+      if (!hasVal(v[kf]) || !hasVal(v[rf])) return null;
+      if (!l || !hasVal(l[kf]) || !hasVal(l[rf])) return { lab, cls:"new", badge:"Primera marca", note:"Ya tienes tu referencia para la próxima." };
+      return { lab, ...compareTop(+v[kf], parseInt(v[rf]), +l[kf], parseInt(l[rf]), tmin) };
+    }).filter(Boolean);
+    if (!parts.length) return;
+    const rank = { up:3, new:2, same:1, mid:0 };
+    const main = parts.reduce((a,b) => rank[b.cls] > rank[a.cls] ? b : a);
+    out.push({ name: ex.name, cls: main.cls, note: main.note, badge: parts.map(x => (x.lab ? x.lab + " " : "") + x.badge).join(" · ") });
+  });
+  return out;
+}
+function entryCounts(e){
+  const all = e.exercises.flatMap(x => x.sets), done = all.filter(s => s.done);
+  return { all: all.length, done: done.length, vol: done.filter(s => s.type !== "aprox").reduce((a,s) => a + setVol(s), 0) };
+}
+function entryPaper(e){
+  const cl = CLIENTS[code], day = cl.days.find(d => d.id === e.dayId) || {}, FB = entryFeedback(e), n = entryCounts(e);
+  const c = x => x === undefined || x === null || x === "" ? `<td class="miss r">—</td>` : `<td class="r">${esc(x)}</td>`;
+  const tables = e.exercises.map((ex, ei) => { const uni = entryUni(ex);
+    return `<section class="rp-ex"><div class="rp-ex-h"><span class="rp-n">${String(ei+1).padStart(2,"0")}</span><h3>${esc(ex.name)}${ex.opt === "B" ? ` <em class="rp-opt">opción B</em>` : ""}</h3></div>${ex.setupHTML || ""}<table><thead><tr><th>Serie</th><th class="r">Kg</th><th class="r">Reps</th><th class="r">RPE</th><th class="r">Objetivo</th><th class="r">Lectura</th></tr></thead><tbody>${
+    ex.sets.map(v => { const tr = v.tRir, rd = rpeRead(v.rpe, tr);
       const has = [v.kg, v.reps, v.kgL, v.repsL].some(hasVal) || v.rpe != null;
-      const c = (x, r) => x === undefined || x === null || x === "" ? `<td class="miss r">—</td>` : `<td class="r">${esc(x)}</td>`;
-      const kgv = ex.uni ? (hasVal(v.kg) || hasVal(v.kgL) ? `D ${hasVal(v.kg) ? fmt(+v.kg) : "—"} / I ${hasVal(v.kgL) ? fmt(+v.kgL) : "—"}` : "") : (v.kg == null || v.kg === "" ? "" : fmt(+v.kg));
-      const repv = ex.uni ? (hasVal(v.reps) || hasVal(v.repsL) ? `${v.reps || "—"} / ${v.repsL || "—"}` : "") : v.reps;
-      return `<tr${has ? "" : ` class="skip"`}><td><span class="rp-t ${s.type}">${TYPE_LABEL[s.type]}${o.extra ? " +" : ""}</span></td>${c(kgv)}${c(repv)}${c(v.rpe)}${c(tr != null ? (tr === "0" ? "Fallo" : "RIR " + tr) : "")}${rd ? `<td class="r"><span class="rp-pill ${rd.cls}">${esc(rd.txt)}</span></td>` : `<td class="miss r">—</td>`}</tr>`; }).join("")
-  }</tbody></table>${noteOf(day, ei) ? `<p class="rp-note"><b>Nota:</b> ${esc(noteOf(day, ei))}</p>` : ""}</section>`).join("");
-  const warmDone = !!log[day.id + "-warm"], hasWarm = !!(day.warm && day.warm.length);
+      const kgv = uni ? (hasVal(v.kg) || hasVal(v.kgL) ? `D ${hasVal(v.kg) ? nf(+v.kg) : "—"} / I ${hasVal(v.kgL) ? nf(+v.kgL) : "—"}` : "") : (v.kg == null || v.kg === "" ? "" : nf(+v.kg));
+      const repv = uni ? (hasVal(v.reps) || hasVal(v.repsL) ? `${v.reps || "—"} / ${v.repsL || "—"}` : "") : v.reps;
+      return `<tr${has ? "" : ` class="skip"`}><td><span class="rp-t ${v.type}">${TYPE_LABEL[v.type]}${v.extra ? " +" : ""}</span></td>${c(kgv)}${c(repv)}${c(v.rpe)}${c(tr != null ? (tr === "0" ? "Fallo" : "RIR " + tr) : "")}${rd ? `<td class="r"><span class="rp-pill ${rd.cls}">${esc(rd.txt)}</span></td>` : `<td class="miss r">—</td>`}</tr>`; }).join("")
+    }</tbody></table>${ex.note ? `<p class="rp-note"><b>Nota:</b> ${esc(ex.note)}</p>` : ""}</section>`; }).join("");
+  const hasWarm = !!(day.warm && day.warm.length), hasCool = !!(day.cool && day.cool.length);
   const progHTML = FB.length ? `<div class="rp-prog"><div class="rp-h">Progreso · top set vs. última vez</div>${FB.map(x => `<div class="rp-pr ${x.cls}"><span>${esc(x.name)}</span><em>${esc(x.badge)}</em></div>`).join("")}</div>` : "";
-  const sh = document.createElement("div");
-  sh.className = "sheet";
-  sh.innerHTML = `<div class="sheet-in" role="dialog" aria-label="Resumen de la sesión">
-    <h2>Sesión guardada</h2>
-    ${feedbackHTML(FB)}
-    <div class="stats">
-      <div class="stat"><small>Series hechas</small><strong>${done.length}/${all.length}</strong></div>
-      <div class="stat"><small>Volumen efectivo</small><strong>${fmt(vol)} kg</strong></div>
-    </div>
-    <div class="paper" aria-label="Vista previa del informe">
+  return `<div class="paper" aria-label="Vista previa del informe">
       <div class="rp-band">
         <div class="rp-logo">Cristian<br><span>Entrenador</span><small>Informe de sesión</small></div>
-        <div class="rp-who"><b>${esc(cl.name)}</b><span>${esc(cl.block || "")}</span><span>${esc(day.label)} · ${esc(date)}</span></div>
+        <div class="rp-who"><b>${esc(cl.name)}</b><span>${esc(e.block || cl.block || "")}</span><span>${esc(e.dayLabel)} · ${esc(longDate(e.ts))}</span></div>
       </div>
       <div class="rp-body">
         <div class="rp-stats">
-          <div class="rp-stat"><small>Series</small><strong>${done.length}/${all.length}</strong></div>
-          <div class="rp-stat"><small>Volumen</small><strong>${fmt(vol)} kg</strong></div>
-          ${hasWarm ? `<div class="rp-stat"><small>Movilidad</small><strong class="${warmDone ? "ok" : ""}">${warmDone ? "Hecho" : "—"}</strong></div>` : day.cool && day.cool.length ? `<div class="rp-stat"><small>Cardio</small><strong class="${log[day.id + "-cool"] ? "ok" : ""}">${log[day.id + "-cool"] ? "Hecho" : "—"}</strong></div>` : ""}
+          <div class="rp-stat"><small>Series</small><strong>${n.done}/${n.all}</strong></div>
+          <div class="rp-stat"><small>Volumen</small><strong>${nf(n.vol)} kg</strong></div>
+          ${hasWarm ? `<div class="rp-stat"><small>Movilidad</small><strong class="${e.warm ? "ok" : ""}">${e.warm ? "Hecho" : "—"}</strong></div>` : hasCool ? `<div class="rp-stat"><small>Cardio</small><strong class="${e.cool ? "ok" : ""}">${e.cool ? "Hecho" : "—"}</strong></div>` : ""}
         </div>
         ${progHTML}
         ${tables}
@@ -1416,63 +1445,36 @@ function showSummary(){
           <div>Volumen sin contar aproximaciones · CristianEntrenador</div>
         </div>
       </div>
-    </div>
-    <div class="share-row">
-      <button class="btn" id="img" disabled>Preparando la imagen…</button>
-      <button class="ghost" id="pdf" disabled>📄 Compartir en PDF</button>
-      <button class="ghost" id="share">📲 Enviar a Cristian por WhatsApp (texto)</button>
-      <button class="ghost" id="copy">Copiar resumen</button>
-      <p class="note" id="share-note">Ya está guardada en tu historial ✓ Solo falta enviársela a Cristian.</p>
-      <button class="ghost" id="close">Listo</button>
-      <button class="undo" id="undo">¿Terminaste sin querer? Deshacer y volver a la sesión</button>
-    </div>
-  </div>`;
-  document.body.appendChild(sh);
-  /* Resumen en texto para mandarlo por WhatsApp (sin pedir ningún dato: el atleta elige el chat) */
-  const summaryText = () => {
-    const L = [`CRISTIANENTRENADOR · ${cl.name}`, `${day.label} · ${date}`];
-    if (day.warm && day.warm.length) L.push(`Calentamiento y movilidad: ${log[day.id + "-warm"] ? "✓ hecho" : "no marcado"}`);
-    if (day.cool && day.cool.length) L.push(`Cardio final: ${log[day.id + "-cool"] ? "✓ hecho" : "no marcado"}`);
-    exs(day).forEach((ex,ei) => {
-      L.push("", ex.name.toUpperCase() + (ex.opt === "B" ? " (opción B)" : ""));
-      setsOf(day,ex,ei).forEach(o => {
-        const st = o.s, v = log[o.k] || {}, tr = tRir(ex, st), rd = rpeRead(v.rpe, tr);
-        const has = [v.kg, v.reps, v.kgL, v.repsL].some(hasVal);
-        if (!has && v.rpe == null){ L.push(`- ${TYPE_LABEL[st.type]}${o.extra ? " extra" : ""}: sin registrar`); return; }
-        const kgr = has ? kgx(v, ex.uni) : "sin kg/reps";
-        L.push(`- ${TYPE_LABEL[st.type]}${o.extra ? " extra" : ""}: ${kgr}${v.rpe != null ? ` · RPE ${v.rpe}` : ""}${tr != null ? ` (RIR ${tr}${rd ? ` → ${rd.txt}` : ""})` : ""}${v.done ? "" : " · no marcada"}`);
-      });
-      if (noteOf(day, ei)) L.push(`📝 Nota: ${noteOf(day, ei)}`);
+    </div>`;
+}
+/* Resumen en texto para mandarlo por WhatsApp (sin pedir ningún dato: el atleta elige el chat) */
+function entryText(e){
+  const cl = CLIENTS[code], day = cl.days.find(d => d.id === e.dayId) || {}, FB = entryFeedback(e), n = entryCounts(e);
+  const L = [`CRISTIANENTRENADOR · ${cl.name}`, `${e.dayLabel} · ${longDate(e.ts)}`];
+  if (day.warm && day.warm.length) L.push(`Calentamiento y movilidad: ${e.warm ? "✓ hecho" : "no marcado"}`);
+  if (day.cool && day.cool.length) L.push(`Cardio final: ${e.cool ? "✓ hecho" : "no marcado"}`);
+  e.exercises.forEach(ex => {
+    const uni = entryUni(ex);
+    L.push("", ex.name.toUpperCase() + (ex.opt === "B" ? " (opción B)" : ""));
+    ex.sets.forEach(v => {
+      const tr = v.tRir, rd = rpeRead(v.rpe, tr), has = [v.kg, v.reps, v.kgL, v.repsL].some(hasVal);
+      if (!has && v.rpe == null){ L.push(`- ${TYPE_LABEL[v.type]}${v.extra ? " extra" : ""}: sin registrar`); return; }
+      const kgr = has ? kgx(v, uni) : "sin kg/reps";
+      L.push(`- ${TYPE_LABEL[v.type]}${v.extra ? " extra" : ""}: ${kgr}${v.rpe != null ? ` · RPE ${v.rpe}` : ""}${tr != null ? ` (RIR ${tr}${rd ? ` → ${rd.txt}` : ""})` : ""}${v.done ? "" : " · no marcada"}`);
     });
-    if (FB.length){ L.push("", "PROGRESO (top set vs. última vez)"); FB.forEach(x => L.push(`${{up:"✅",new:"⭐",same:"➖",mid:"🔸"}[x.cls]} ${x.name}: ${x.badge}`)); }
-    L.push("", `${done.length}/${all.length} series · Volumen efectivo ${fmt(vol)} kg`);
-    return L.join("\n");
-  };
-  const note = sh.querySelector("#share-note");
-  /* Guardado automático al terminar: se guarda ya, con copia por si quiere deshacer */
-  const TXT = summaryText(), entryId = "s" + Date.now();
-  const keys = Object.keys(log).filter(k => k.startsWith(day.id + "-"));
-  const snap = {}; keys.forEach(k => snap[k] = log[k]);
-  hist.push({ id: entryId, ts: Date.now(), dayId: day.id, dayLabel: day.label,
-    exercises: exs(day).map((ex,ei) => ({ name: ex.name, opt: ex.opt || undefined, note: noteOf(day, ei) || undefined, sets: setsOf(day,ex,ei).map(o => {
-      const s = o.s, v = log[o.k] || {};
-      return { extra: o.extra || undefined, type: s.type, kg: v.kg ?? "", reps: v.reps ?? "", ...(ex.uni ? { kgL: v.kgL ?? "", repsL: v.repsL ?? "" } : {}), rpe: v.rpe ?? null, rir: v.rir ?? null, tRir: tRir(ex, s), done: !!v.done };
-    })})), warm: !!log[day.id + "-warm"], cool: !!log[day.id + "-cool"]
+    if (ex.note) L.push(`📝 Nota: ${ex.note}`);
   });
-  saveHist(); keys.forEach(k => delete log[k]); save();
-  const close = () => { sh.remove(); view = "home"; render(); window.scrollTo(0,0); };
-  sh.querySelector("#close").onclick = close;
-  sh.addEventListener("click", e => { if (e.target === sh) close(); });
-  sh.querySelector("#undo").onclick = () => {
-    hist = hist.filter(e => e.id !== entryId); saveHist();
-    Object.assign(log, snap); save(); sh.remove(); renderSession();
-    toast("Listo, sigues con la sesión donde la dejaste");
-  };
-  /* Imagen y PDF: se preparan al abrir el resumen, así compartir es instantáneo al tocar */
+  if (FB.length){ L.push("", "PROGRESO (top set vs. última vez)"); FB.forEach(x => L.push(`${{up:"✅",new:"⭐",same:"➖",mid:"🔸"}[x.cls]} ${x.name}: ${x.badge}`)); }
+  L.push("", `${n.done}/${n.all} series · Volumen efectivo ${nf(n.vol)} kg`);
+  return L.join("\n");
+}
+/* Botones de compartir (imagen, PDF, WhatsApp, copiar) sobre un informe ya montado */
+function wireShare(sh, e){
+  const cl = CLIENTS[code], note = sh.querySelector("#share-note"), TXT = entryText(e);
   const imgBtn = sh.querySelector("#img"), pdfBtn = sh.querySelector("#pdf");
   const slug = t => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  const d0 = new Date(), ds = `${d0.getFullYear()}-${String(d0.getMonth()+1).padStart(2,"0")}-${String(d0.getDate()).padStart(2,"0")}`;
-  const base = `CristianEntrenador_${slug(cl.name)}_${slug(day.label.split("·")[0])}_${ds}`;
+  const d0 = new Date(e.ts), ds = `${d0.getFullYear()}-${String(d0.getMonth()+1).padStart(2,"0")}-${String(d0.getDate()).padStart(2,"0")}`;
+  const base = `CristianEntrenador_${slug(cl.name)}_${slug(e.dayLabel.split("·")[0])}_${ds}`;
   let rep = null;
   reportRender(sh.querySelector(".paper")).then(r => {
     rep = r; imgBtn.disabled = false; pdfBtn.disabled = false; imgBtn.textContent = "🖼️ Guardar / compartir imagen";
@@ -1488,7 +1490,7 @@ function showSummary(){
   pdfBtn.onclick = async () => {
     if (!rep) return;
     let pdf;
-    try { pdf = reportPdf(rep.canvas); } catch(e){ note.textContent = "No se pudo crear el PDF. Usa la imagen."; return; }
+    try { pdf = reportPdf(rep.canvas); } catch(err){ note.textContent = "No se pudo crear el PDF. Usa la imagen."; return; }
     const out = await shareFile(new File([pdf], base + ".pdf", { type: "application/pdf" }));
     if (out === "shared") note.textContent = "PDF listo ✓ Mándaselo a Cristian por WhatsApp.";
     else if (out === "fallback") note.textContent = "Tu móvil no deja compartir el PDF desde aquí. Usa el botón de la imagen.";
@@ -1498,15 +1500,78 @@ function showSummary(){
     note.textContent = "Se abre WhatsApp: elige el chat con Cristian y envía ✓";
   };
   sh.querySelector("#copy").onclick = async () => {
-    const t = TXT;
-    try { await navigator.clipboard.writeText(t); note.textContent = "Resumen copiado ✓ Pégalo en el chat con Cristian."; }
-    catch(e){
+    try { await navigator.clipboard.writeText(TXT); note.textContent = "Resumen copiado ✓ Pégalo en el chat con Cristian."; }
+    catch(err){
       note.innerHTML = "";
-      const ta = document.createElement("textarea"); ta.value = t; ta.readOnly = true; ta.rows = 8;
+      const ta = document.createElement("textarea"); ta.value = TXT; ta.readOnly = true; ta.rows = 8;
       ta.style.cssText = "width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px";
       note.append("No se pudo copiar solo. Mantén pulsado el texto, cópialo y pégalo en WhatsApp:", ta); ta.focus(); ta.select();
     }
   };
+}
+const shareButtons = (noteTxt, extra) => `<div class="share-row">
+      <button class="btn" id="img" disabled>Preparando la imagen…</button>
+      <button class="ghost" id="pdf" disabled>📄 Compartir en PDF</button>
+      <button class="ghost" id="share">📲 Enviar a Cristian por WhatsApp (texto)</button>
+      <button class="ghost" id="copy">Copiar resumen</button>
+      <p class="note" id="share-note">${noteTxt}</p>
+      <button class="ghost" id="close">Listo</button>${extra || ""}
+    </div>`;
+
+function showSummary(){
+  const cl = CLIENTS[code], day = cl.days[dayIdx];
+  const FB = progressFeedback(day);
+  /* Guardado automático al terminar: se guarda ya, con copia por si quiere deshacer */
+  const entryId = "s" + Date.now();
+  const keys = Object.keys(log).filter(k => k.startsWith(day.id + "-"));
+  const snap = {}; keys.forEach(k => snap[k] = log[k]);
+  const e = { id: entryId, ts: Date.now(), dayId: day.id, dayLabel: day.label, block: cl.block || undefined, fb: FB,
+    exercises: exs(day).map((ex,ei) => ({ name: ex.name, opt: ex.opt || undefined, note: noteOf(day, ei) || undefined, setupHTML: setupPdf(day, ex, ei) || undefined, sets: setsOf(day,ex,ei).map(o => {
+      const s = o.s, v = log[o.k] || {};
+      return { extra: o.extra || undefined, type: s.type, kg: v.kg ?? "", reps: v.reps ?? "", ...(ex.uni ? { kgL: v.kgL ?? "", repsL: v.repsL ?? "" } : {}), rpe: v.rpe ?? null, rir: v.rir ?? null, tRir: tRir(ex, s), done: !!v.done };
+    })})), warm: !!log[day.id + "-warm"], cool: !!log[day.id + "-cool"]
+  };
+  const n = entryCounts(e);
+  const sh = document.createElement("div");
+  sh.className = "sheet";
+  sh.innerHTML = `<div class="sheet-in" role="dialog" aria-label="Resumen de la sesión">
+    <h2>Sesión guardada</h2>
+    ${feedbackHTML(FB)}
+    <div class="stats">
+      <div class="stat"><small>Series hechas</small><strong>${n.done}/${n.all}</strong></div>
+      <div class="stat"><small>Volumen efectivo</small><strong>${nf(n.vol)} kg</strong></div>
+    </div>
+    ${entryPaper(e)}
+    ${shareButtons("Ya está guardada en tu historial ✓ Solo falta enviársela a Cristian. Si algo falla, la puedes volver a compartir desde Historial.",
+      `<button class="undo" id="undo">¿Terminaste sin querer? Deshacer y volver a la sesión</button>`)}
+  </div>`;
+  document.body.appendChild(sh);
+  hist.push(e); saveHist(); keys.forEach(k => delete log[k]); save();
+  const close = () => { sh.remove(); view = "home"; render(); window.scrollTo(0,0); };
+  sh.querySelector("#close").onclick = close;
+  sh.addEventListener("click", ev => { if (ev.target === sh) close(); });
+  sh.querySelector("#undo").onclick = () => {
+    hist = hist.filter(x => x.id !== entryId); saveHist();
+    Object.assign(log, snap); save(); sh.remove(); renderSession();
+    toast("Listo, sigues con la sesión donde la dejaste");
+  };
+  wireShare(sh, e);
+}
+
+/* Reabrir el informe de una sesión ya guardada (desde Historial) para volver a compartirlo */
+function showSavedReport(e){
+  const sh = document.createElement("div");
+  sh.className = "sheet";
+  sh.innerHTML = `<div class="sheet-in" role="dialog" aria-label="Informe de la sesión">
+    <h2>Informe de la sesión</h2>
+    ${entryPaper(e)}
+    ${shareButtons("Es el mismo informe de ese día. Compártelo y mándaselo a Cristian.")}
+  </div>`;
+  document.body.appendChild(sh);
+  const close = () => sh.remove();
+  sh.querySelector("#close").onclick = close;
+  sh.addEventListener("click", ev => { if (ev.target === sh) close(); });
+  wireShare(sh, e);
 }
 
 /* ---------- Imagen del informe (PNG) ---------- */
