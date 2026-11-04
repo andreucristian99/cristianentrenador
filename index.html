@@ -858,7 +858,7 @@ const CLIENTS = {
         { name:"Hack squat", img:"fotos/hack-squat.jpg", video:"9E0oA25ZBlo", setup:"Peso = total de discos (sin la máquina)", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
           {type:"top", target:"8 reps", prev:"10×8"},
           {type:"bo", target:"10 reps", prev:"10×8"} ]},
-        { name:"Sentadilla búlgara con mancuernas", video:"t4-_udCqwqI", uni:true, rir:"2", cues:[], sets:[
+        { name:"Sentadilla búlgara con mancuernas", video:"t4-_udCqwqI", uni:true, limb:"Pierna", rir:"2", cues:[], sets:[
           {type:"top", target:"8 reps", prev:"8×10|8×10"} ]},
         { name:"Extensión lumbar", img:"fotos/extension-lumbar.jpg", video:"_lrQxyQd7A8", setup:"Nivel de asiento 6", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"10×10"},
@@ -1492,8 +1492,9 @@ function setRow(day, ex, ei, o, canDel){
   </div>`;
 }
 
-/* Unilaterales: selector Brazo derecho / Brazo izquierdo, cada lado con su kg y reps */
+/* Unilaterales: selector derecho / izquierdo (Brazo por defecto, o ex.limb p. ej. "Pierna"), cada lado con su kg y reps */
 function sidesHTML(day, ei, o, k, v){
+  const limb = day.exercises[ei].limb || "Brazo", g = limb === "Pierna" ? "a" : "o";
   const cur = v.side === "L" ? "L" : "R", l = lastFor(day.id, ei, o.s.type, o.ord, day.exercises[ei].alt ? eff(day, ei).name : null);
   const mini = (kg, r) => hasVal(kg) || hasVal(r) ? `${hasVal(kg) ? fmt(+kg) : "—"}×${hasVal(r) ? r : "—"}` : "";
   const blk = (sd, kf, rf) => `<div class="nums" data-side="${sd}"${cur === sd ? "" : " hidden"}>
@@ -1502,9 +1503,9 @@ function sidesHTML(day, ei, o, k, v){
       ${lastHTML(l, sd)}
       <button class="check" aria-label="Marcar serie como hecha" aria-pressed="${!!v.done}">✓</button>
     </div>`;
-  return `<div class="sides" role="group" aria-label="Brazo">
-      <button class="side" data-s="R" aria-pressed="${cur === "R"}">Brazo derecho<small>${mini(v.kg, v.reps)}</small></button>
-      <button class="side" data-s="L" aria-pressed="${cur === "L"}">Brazo izquierdo<small>${mini(v.kgL, v.repsL)}</small></button>
+  return `<div class="sides" role="group" aria-label="${limb}">
+      <button class="side" data-s="R" aria-pressed="${cur === "R"}">${limb} derech${g}<small>${mini(v.kg, v.reps)}</small></button>
+      <button class="side" data-s="L" aria-pressed="${cur === "L"}">${limb} izquierd${g}<small>${mini(v.kgL, v.repsL)}</small></button>
     </div>${blk("R","kg","reps")}${blk("L","kgL","repsL")}`;
 }
 function wireSet(el){
