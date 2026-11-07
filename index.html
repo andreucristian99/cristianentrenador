@@ -1567,8 +1567,8 @@ function exCard(day, ex, ei){
       ${mediaHTML(ex, `${day.id}-${ei}`)}
       ${ex.cues.map(c=>`<div>• ${esc(c)}</div>`).join("")}
     </div>
-    ${(sets => sets.map(o => setRow(day,ex,ei,o, o.extra && o.xi === sets.filter(x => x.extra).length - 1)).join(""))(setsOf(day,ex,ei))}
     <button class="add-aprox" data-ei="${ei}">+ Aproximación</button>
+    ${(sets => sets.map(o => setRow(day,ex,ei,o, o.extra && o.xi === sets.filter(x => x.extra).length - 1)).join(""))(setsOf(day,ex,ei))}
     ${noteHTML(day, ei)}
   </article>`;
 }
