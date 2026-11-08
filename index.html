@@ -1076,6 +1076,81 @@ const CLIENTS = {
     ]
   },
 
+  /* ---------- Natalia Benitez · rutina de la Semana 1 (sin registros previos) ----------
+     Todo a RIR 2. Mismo split que su Sheet: Upper A / Legday A / Fullbody, con opción B cuando la hay.
+     Hack squat: peso = total de discos sin la máquina. Extensión lumbar: nivel 6 (setup de la S1). */
+  "487104": {
+    name: "Natalia", block: "Semana 1", seedVer: 1, fresh: true,
+    days: [
+      { id:"U1", label:"Día 1 · Upper A", exercises:[
+        { name:"Press inclinado en máquina de placas", img:"fotos/press-inclinado-placas.jpg", video:"Amvr9w2skr4", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]},
+        { name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", video:"2awX3rTGa1k", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ],
+          alt:{ name:"Press plano en máquina de placas (al lado de los aductores)", img:"fotos/press-plano-aductores.jpg", sets:[
+            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
+        { name:"Vuelos laterales con mancuernas sentada", video:"lvUvnvXgh-Y", rir:"2", cues:[], sets:[
+          {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ]},
+        { name:"Press militar en máquina de placas", img:"fotos/press-militar-placas.jpg", video:"oUDnqyu2ZIE", rir:"2", cues:[], sets:[
+          {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"} ]},
+        { name:"Jalón al pecho en máquina de placas", img:"fotos/jalon-placas.jpg", video:"VPIcgV_i0VQ", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ],
+          alt:{ name:"Jalón al pecho en polea", img:"fotos/jalon-polea.jpg", sets:[
+            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
+        { name:"Remo en polea", img:"fotos/remo-polea.jpg", video:"HJw0-W-cQog", rir:"2", cues:[], sets:[
+          {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"} ]},
+        { name:"Press francés con mancuernas", video:"C4jBxuNd9kc", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}
+      ]},
+      { id:"L1", label:"Día 2 · Legday A", coolTitle:"Para terminar",
+        cool:[{n:"Plancha", t:"1 min"}], exercises:[
+        { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"ap1RsdCzZN4", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ],
+          alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", sets:[
+            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]}},
+        { name:"Curl femoral tumbado", img:"fotos/curl-femoral-tumbado.jpg", video:"B6t8MvbTtew", rir:"2", cues:[], sets:[
+          {type:"top", target:"8–10 reps"}, {type:"bo", target:"8–10 reps"} ]},
+        { name:"Hack squat", img:"fotos/hack-squat.jpg", video:"itmlCUc0P3k", setup:"Peso = total de discos (sin la máquina)", rir:"2", cues:[], sets:[
+          {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ],
+          alt:{ name:"Sentadilla goblet", img:null, video:"yTDROg8zZsU", setup:null, sets:[
+            {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ]}},
+        { name:"Extensión lumbar", img:"fotos/extension-lumbar.jpg", video:"_lrQxyQd7A8", setup:"Nivel 6", rir:"2", cues:[], sets:[
+          {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"}, {type:"bo2", target:"12 reps"} ]},
+        { name:"Peso muerto rumano", video:"5rIqP63yWFg", rir:"2", cues:[], sets:[
+          {type:"top", target:"6 reps"}, {type:"bo", target:"8 reps"} ]},
+        { name:"Abdominales crunch", video:"dNuGXV0nXGA", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]}
+      ]},
+      { id:"F1", label:"Día 3 · Fullbody",
+        warm:[
+          {n:"Foam roller tren inferior", t:"2 min", url:"https://www.youtube.com/shorts/WsAw5__Kogw"},
+          {n:"Foam roller tren superior", t:"2 min", url:"https://www.youtube.com/shorts/fYyEcDKZeQ8"},
+          {n:"Movilidad tren superior", t:"2 min", url:"https://www.youtube.com/shorts/ovlIa5-kOws"},
+          {n:"Movilidad tren superior 2", t:"2 min", url:"https://www.youtube.com/shorts/11Ezm7qFnj8"} ], exercises:[
+        { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"ap1RsdCzZN4", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ],
+          alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", sets:[
+            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
+        { name:"Curl femoral sentado con respaldo", img:"fotos/curl-femoral-respaldo.jpg", video:"kBxq2e7xStI", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ],
+          alt:{ name:"Curl femoral sentado sin respaldo", img:"fotos/curl-femoral-sin-respaldo.jpg", sets:[
+            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
+        { name:"Prensa inclinada", img:"fotos/prensa-inclinada.jpg", video:"U-zzH06qFXg", rir:"2", cues:[], sets:[
+          {type:"top", target:"8–10 reps"}, {type:"bo", target:"8–10 reps"} ],
+          alt:{ name:"Prensa horizontal", img:"fotos/prensa-horizontal.jpg", video:"W7bL6i1sJo4", sets:[
+            {type:"top", target:"8–10 reps"}, {type:"bo", target:"8–10 reps"} ]}},
+        { name:"Jalón al pecho en máquina de placas (zona de circuitos)", img:"fotos/jalon-placas-circuitos.jpg", video:"VPIcgV_i0VQ", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]},
+        { name:"Remo en máquina de placas (zona de circuitos)", img:"fotos/remo-placas-circuitos.jpg", video:"mOpmtLusBBM", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]},
+        { name:"Fondos en máquina de placas", img:"fotos/fondos-placas.jpg", video:"dEaa8tvJ7TY", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]},
+        { name:"Curl de bíceps en máquina", video:"VBT3DOG5V08", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}
+      ]}
+    ]
+  },
+
   /* ---------- Alberto · rutina de "Copia de SEMANA3 OCT"; "última vez" = SEMANA3 OCT ----------
      Todo a RIR 2. Día 1: ya hizo la opción B en la copia (ext. cuádriceps, hack en Smith, curl femoral, abductor de pie),
      así que el prev va en la B. Curl femoral 45×9+1: cuenta 9. Smith: kg por lado. Peck fly en libras (como la máquina).
@@ -1297,6 +1372,8 @@ const n0 = v => parseFloat(v) || 0;
 /* Sesiones de ejemplo para que el prototipo tenga datos (la app real usará las del cliente) */
 function seedHistory(c){
   const cl = CLIENTS[c], out = [], WEEKS = 5, now = new Date();
+  /* Atleta nuevo, sin semana anterior: empieza con el historial vacío */
+  if (cl.fresh) return out;
   if (cl.lastWeek){
     /* Semana anterior real, cargada desde el Excel de Cristian: una sesión por día */
     cl.days.forEach((day, di) => {
