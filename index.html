@@ -2104,13 +2104,13 @@ function entryText(e){
 /* Botones de compartir (imagen, PDF, WhatsApp, copiar) sobre un informe ya montado */
 function wireShare(sh, e){
   const cl = CLIENTS[code], note = sh.querySelector("#share-note"), TXT = entryText(e);
-  const imgBtn = sh.querySelector("#img"), pdfBtn = sh.querySelector("#pdf");
+  const imgBtn = sh.querySelector("#img");
   const slug = t => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const d0 = new Date(e.ts), ds = `${d0.getFullYear()}-${String(d0.getMonth()+1).padStart(2,"0")}-${String(d0.getDate()).padStart(2,"0")}`;
   const base = `CristianEntrenador_${slug(cl.name)}_${slug(e.dayLabel.split("·")[0])}_${ds}`;
   let rep = null;
   reportRender(sh.querySelector(".paper")).then(r => {
-    rep = r; imgBtn.disabled = false; pdfBtn.disabled = false; imgBtn.textContent = "🖼️ Guardar / compartir imagen";
+    rep = r; imgBtn.disabled = false; imgBtn.textContent = "🖼️ Compartir imagen con Cristian";
   }).catch(() => {
     imgBtn.textContent = "No se pudo crear la imagen"; note.textContent = "Haz una captura de pantalla del informe y mándasela a Cristian.";
   });
@@ -2120,33 +2120,9 @@ function wireShare(sh, e){
     if (out === "shared") note.textContent = "Listo ✓ Si la guardaste en Fotos, mándasela a Cristian por WhatsApp.";
     else if (out === "fallback") showReportImage(rep.blob);
   };
-  pdfBtn.onclick = async () => {
-    if (!rep) return;
-    let pdf;
-    try { pdf = reportPdf(rep.canvas); } catch(err){ note.textContent = "No se pudo crear el PDF. Usa la imagen."; return; }
-    const out = await shareFile(new File([pdf], base + ".pdf", { type: "application/pdf" }));
-    if (out === "shared") note.textContent = "PDF listo ✓ Mándaselo a Cristian por WhatsApp.";
-    else if (out === "fallback") note.textContent = "Tu móvil no deja compartir el PDF desde aquí. Usa el botón de la imagen.";
-  };
-  sh.querySelector("#share").onclick = () => {
-    window.open("https://wa.me/?text=" + encodeURIComponent(TXT), "_blank", "noopener");
-    note.textContent = "Se abre WhatsApp: elige el chat con Cristian y envía ✓";
-  };
-  sh.querySelector("#copy").onclick = async () => {
-    try { await navigator.clipboard.writeText(TXT); note.textContent = "Resumen copiado ✓ Pégalo en el chat con Cristian."; }
-    catch(err){
-      note.innerHTML = "";
-      const ta = document.createElement("textarea"); ta.value = TXT; ta.readOnly = true; ta.rows = 8;
-      ta.style.cssText = "width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px";
-      note.append("No se pudo copiar solo. Mantén pulsado el texto, cópialo y pégalo en WhatsApp:", ta); ta.focus(); ta.select();
-    }
-  };
 }
 const shareButtons = (noteTxt, extra) => `<div class="share-row">
       <button class="btn" id="img" disabled>Preparando la imagen…</button>
-      <button class="ghost" id="pdf" disabled>📄 Compartir en PDF</button>
-      <button class="ghost" id="share">📲 Enviar a Cristian por WhatsApp (texto)</button>
-      <button class="ghost" id="copy">Copiar resumen</button>
       <p class="note" id="share-note">${noteTxt}</p>
       <button class="ghost" id="close">Listo</button>${extra || ""}
     </div>`;
