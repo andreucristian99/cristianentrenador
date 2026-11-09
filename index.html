@@ -1182,34 +1182,40 @@ const CLIENTS = {
   },
 
   /* ---------- Alberto · rutina de "Copia de SEMANA3 OCT"; "última vez" = SEMANA3 OCT ----------
-     Todo a RIR 2. Día 1: ya hizo la opción B en la copia (ext. cuádriceps, hack en Smith, curl femoral, abductor de pie),
-     así que el prev va en la B. Curl femoral 45×9+1: cuenta 9. Smith: kg por lado. Peck fly en libras (como la máquina).
+     Todo a RIR 2. Día 1 (seedVer 2, 9 nov): la última vez la hizo en la opción A (SEMANA3 OCT): ext. cuádriceps con respaldo,
+     hack squat (15/10 kg por lado → 30/20 kg de discos en total), curl femoral con respaldo, abductor. La B conserva su prev anterior. Curl femoral 45×9+1: cuenta 9. Smith: kg por lado. Peck fly en libras (como la máquina).
      El día 2 aún no tiene registros. */
   "731905": {
-    name: "Alberto", block: "Noviembre · Semana 1", seedVer: 1, lastWeek: "Octubre · Semana 3",
+    name: "Alberto", block: "Noviembre · Semana 1", seedVer: 2, lastWeek: "Octubre · Semana 3",
     days: [
       { id:"L1", label:"Día 1 · Tren inferior",
         cool:[{n:"Cinta: inclinación 15, velocidad 3,5", t:"10 min"}], exercises:[
         { name:"Abdominales con ruedita", video:"pTOsnzYMiXc", rir:"2", cues:[], sets:[
           {type:"top", target:"Las que salgan"}, {type:"bo", target:"Las que salgan"} ]},
         { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"RRxao7N3pSw", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
-          {type:"top", target:"12–15 reps"}, {type:"bo", target:"12–15 reps"}, {type:"bo2", target:"12–15 reps"} ],
+          {type:"top", target:"12–15 reps", prev:"59×12"},
+          {type:"bo", target:"12–15 reps", prev:"52×13"},
+          {type:"bo2", target:"12–15 reps", prev:"52×12"} ],
           alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", sets:[
             {type:"top", target:"12–15 reps", prev:"58×12"},
             {type:"bo", target:"12–15 reps", prev:"54×14"},
             {type:"bo2", target:"12–15 reps", prev:"54×12"} ]}},
         { name:"Hack squat", img:"fotos/hack-squat.jpg", video:"9E0oA25ZBlo", setup:"Peso = total de discos (sin la máquina)", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
-          {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"} ],
+          {type:"top", target:"8 reps", prev:"30×8"},
+          {type:"bo", target:"10 reps", prev:"20×12"} ],
           alt:{ name:"Hack squat en Smith", img:"fotos/smith.jpg", setup:"Peso = kg por lado de la barra", sets:[
             {type:"top", target:"8 reps", prev:"0×10"},
             {type:"bo", target:"10 reps", prev:"5×10"} ]}},
         { name:"Curl femoral sentado con respaldo", img:"fotos/curl-femoral-respaldo.jpg", video:"6IvQvWZmEsw", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
-          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ],
+          {type:"top", target:"10 reps", prev:"57×12"},
+          {type:"bo", target:"10 reps", prev:"57×10"} ],
           alt:{ name:"Curl femoral sentado sin respaldo", img:"fotos/curl-femoral-sin-respaldo.jpg", sets:[
             {type:"top", target:"10 reps", prev:"45×10"},
             {type:"bo", target:"10 reps", prev:"45×9"} ]}},
         { name:"Abductor en máquina", img:"fotos/abductor-aductor.jpg", video:"xlp6FYwBFLU", rir:"2", cues:[], sets:[
-          {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"}, {type:"bo2", target:"12 reps"} ],
+          {type:"top", target:"12 reps", prev:"30×8"},
+          {type:"bo", target:"12 reps", prev:"30×12"},
+          {type:"bo2", target:"12 reps", prev:"30×13"} ],
           alt:{ name:"Abductor en máquina (de pie)", img:null, sets:[
             {type:"top", target:"12 reps", prev:"40×12"},
             {type:"bo", target:"12 reps", prev:"40×15"},
