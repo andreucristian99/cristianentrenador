@@ -101,6 +101,13 @@ button{cursor:pointer}
 .field input:focus{border-color:var(--accent);outline:none}
 .check{align-self:end;height:46px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);font-size:20px;color:var(--muted)}
 .set.done .check{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+/* Ejercicios de "solo marcar hecho" (estiramientos): sin kg, reps ni RPE */
+.ok-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ok-row .field{flex:1;max-width:150px}
+.ok-row .field small{text-transform:none;letter-spacing:0;font-weight:400}
+.ok-row .check{align-self:end;font-size:15px;font-weight:700;padding:0 18px;min-width:120px}
+.tag.ok{color:var(--ok)}
+.rp-t.ok{color:#2e8b57}
 .set.done .field input{border-color:transparent;color:var(--ok)}
 .scale{display:grid;grid-template-columns:38px 1fr;align-items:center;gap:8px}
 .scale .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
@@ -1294,15 +1301,119 @@ const CLIENTS = {
           {type:"bo", target:"10 reps", prev:"27×12"} ]}
       ]}
     ]
+  },
+  /* ---------- Letizia · rutina del 10 de noviembre (la misma ~3 meses); "última vez" = NOV 1 (u hojas anteriores) ----------
+     Todo a RIR 2. Pesos de referencia de sus últimas planillas; los que ella anotaba "por lado"
+     (hack squat, RDL, búlgaras, prensa) van en kilos totales sumando ambos lados. Jalón: referencia de la máquina de discos.
+     Vuelos: kg por mancuerna. El estiramiento en paralela solo se marca como hecho. */
+  "683027": {
+    name: "Letizia", block: "Rutina desde el 10 de noviembre", seedVer: 1, lastWeek: "Noviembre · Semana 1",
+    days: [
+      { id:"U1", label:"Día 1 · Upper A", exercises:[
+        { name:"Vuelos laterales con mancuernas (banco inclinado)", video:"b9Sq0GBUP1U", setup:"Banco a 30°", rir:"2", cues:[], sets:[
+          {type:"top", target:"12–15 reps", prev:"2×12"},
+          {type:"bo", target:"12–15 reps", prev:"4×10"},
+          {type:"bo2", target:"12–15 reps", prev:"4×10"} ]},
+        { name:"Press plano con mancuernas", video:"R3eCn7-9wC0", setup:"Banco a 0°", rir:"2", cues:[], sets:[
+          {type:"top", target:"6–8 reps"},
+          {type:"bo", target:"10 reps"} ]},
+        { name:"Fondos en máquina de placas", img:"fotos/fondos-placas.jpg", video:"dEaa8tvJ7TY", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"},
+          {type:"bo", target:"10 reps"} ]},
+        { name:"Jalón al pecho en polea", img:"fotos/jalon-polea.jpg", video:"ves4oPpWQAE", setup:"Agarre neutro", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps", prev:"10×12"},
+          {type:"bo", target:"10 reps", prev:"20×12"} ]},
+        { name:"Remo en T", video:"udi--2PLXAQ", setup:"Agarre cerrado", rir:"2", cues:[], sets:[
+          {type:"top", target:"8 reps"},
+          {type:"bo", target:"8 reps"} ]},
+        { name:"Abs crunch en colchoneta", video:"dNuGXV0nXGA", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"},
+          {type:"bo", target:"10 reps"},
+          {type:"bo2", target:"10 reps"} ]}
+      ]},
+      { id:"L1", label:"Día 2 · Legday A", cool:[{n:"Cinta con la inclinación al máximo", t:"6 min"}], exercises:[
+        { name:"Extensión de gemelos en prensa horizontal", img:"fotos/prensa-horizontal.jpg", video:"ZFephCP1AXU", rir:"2", cues:[], sets:[
+          {type:"top", target:"10–12 reps"},
+          {type:"bo", target:"10–12 reps"},
+          {type:"bo2", target:"10–12 reps"} ],
+          alt:{ name:"Extensión de gemelos de pie", img:null, video:"KdL3ODZWdpM", sets:[
+            {type:"top", target:"10–12 reps"}, {type:"bo", target:"10–12 reps"}, {type:"bo2", target:"10–12 reps"} ]}},
+        { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"ap1RsdCzZN4", setup:"Respaldo en 1", rir:"2", cues:[], sets:[
+          {type:"top", target:"8–10 reps", prev:"36×12"},
+          {type:"bo", target:"8–10 reps", prev:"36×12"} ],
+          alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", setup:null, sets:[
+            {type:"top", target:"8–10 reps"}, {type:"bo", target:"8–10 reps"} ]}},
+        { name:"Abductor en máquina", img:"fotos/abductor-aductor.jpg", video:"xlp6FYwBFLU", setup:"Inclina el torso hacia delante", rir:"2", cues:[], sets:[
+          {type:"top", target:"12 reps", prev:"43×18"},
+          {type:"bo", target:"12 reps", prev:"43×18"},
+          {type:"bo2", target:"12 reps", prev:"43×18"} ],
+          alt:{ name:"Abductor en máquina de pie", img:null, video:"qDYL1oHVLDw", setup:null, sets:[
+            {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"}, {type:"bo2", target:"12 reps"} ]}},
+        { name:"Hack squat", img:"fotos/hack-squat.jpg", video:"itmlCUc0P3k", memo:["PESO: KILOS TOTAL SUMANDO AMBOS LADOS"], rir:"2", cues:[], sets:[
+          {type:"top", target:"8–10 reps", prev:"20×13"},
+          {type:"bo", target:"10–12 reps", prev:"20×15"} ]},
+        { name:"Curl femoral tumbado", img:"fotos/curl-femoral-tumbado.jpg", video:"B6t8MvbTtew", setup:"0–5", rir:"2", cues:[], sets:[
+          {type:"top", target:"10–12 reps", prev:"23×12"},
+          {type:"bo", target:"10–12 reps", prev:"24×10"} ]}
+      ]},
+      { id:"U2", label:"Día 3 · Upper B", exercises:[
+        { name:"Extensión lumbar", img:"fotos/extension-lumbar.jpg", video:"_lrQxyQd7A8", rir:"2", cues:[], sets:[
+          {type:"top", target:"12 reps"},
+          {type:"bo", target:"12 reps"} ]},
+        { name:"RDL (peso muerto rumano con barra)", video:"5rIqP63yWFg", memo:["PESO: KILOS TOTAL SUMANDO AMBOS LADOS"], rir:"2", cues:[], sets:[
+          {type:"top", target:"6–8 reps", prev:"10×12"},
+          {type:"bo", target:"10 reps", prev:"10×12"} ]},
+        { name:"Estiramiento en paralela (estirar columna)", check:true, img:"fotos/paralelas.jpg", video:"qgZqZ3AIgAA", cues:[], sets:[
+          {type:"ok", target:"30–40 segundos"} ]},
+        { name:"Reverse fly", img:"fotos/peck-fly.jpg", video:"7tgx6QHB0-A", setup:"Máximo recorrido", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"},
+          {type:"bo", target:"10 reps"} ]},
+        { name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", video:"2awX3rTGa1k", rir:"2", cues:[], sets:[
+          {type:"top", target:"8–10 reps"},
+          {type:"bo", target:"10–12 reps"} ],
+          alt:{ name:"Press plano en máquina de placas (al lado de los aductores)", img:"fotos/press-plano-aductores.jpg", sets:[
+            {type:"top", target:"8–10 reps"}, {type:"bo", target:"10–12 reps"} ]}},
+        { name:"Press inclinado en máquina de placas", img:"fotos/press-inclinado-placas.jpg", video:"Amvr9w2skr4", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"},
+          {type:"bo", target:"10 reps"} ]},
+        { name:"Press militar en máquina de placas", img:"fotos/press-militar-placas.jpg", video:"oUDnqyu2ZIE", setup:"Zona de circuitos", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps", prev:"14×12"},
+          {type:"bo", target:"10 reps", prev:"14×12"} ]}
+      ]},
+      { id:"L2", label:"Día 4 · Legday B", exercises:[
+        { name:"Aductor en máquina", img:"fotos/abductor-aductor.jpg", video:"Nr_eo1Fd9oQ", rir:"2", cues:[], sets:[
+          {type:"top", target:"10–12 reps", prev:"23×20"},
+          {type:"bo", target:"10–12 reps", prev:"23×25"} ]},
+        { name:"Sentadillas búlgaras con mancuernas", video:"t4-_udCqwqI", memo:["PESO: KILOS TOTAL SUMANDO AMBOS LADOS"], rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps", prev:"10×12"},
+          {type:"bo", target:"10 reps", prev:"10×12"} ]},
+        { name:"Curl femoral sentado con respaldo", img:"fotos/curl-femoral-respaldo.jpg", video:"kBxq2e7xStI", rir:"2", cues:[], sets:[
+          {type:"top", target:"10–12 reps", prev:"43×12"},
+          {type:"bo", target:"10–12 reps", prev:"43×12"} ],
+          alt:{ name:"Curl femoral sentado sin respaldo", img:"fotos/curl-femoral-sin-respaldo.jpg", setup:null, sets:[
+            {type:"top", target:"10–12 reps"}, {type:"bo", target:"10–12 reps"} ]}},
+        { name:"Prensa inclinada", img:"fotos/prensa-inclinada.jpg", video:"U-zzH06qFXg", memo:["PESO: KILOS TOTAL SUMANDO AMBOS LADOS"], rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps", prev:"45×13"},
+          {type:"bo", target:"10 reps", prev:"45×13"} ]},
+        { name:"Sissy squat", video:"AYN-U5nZieY", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"},
+          {type:"bo", target:"10 reps"},
+          {type:"bo2", target:"10 reps"} ]},
+        { name:"Abdominales crunch en máquina", img:"fotos/abdominales-crunch.jpg", video:"b6ONE9Rfgl8", setup:"Zona de circuitos", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps", prev:"14×12"},
+          {type:"bo", target:"10 reps", prev:"18×15"},
+          {type:"bo2", target:"10 reps"} ]}
+      ]}
+    ]
   }
 };
 /* Fotos de tus bibliotecas de máquinas */
 const PHOTOS = {};
-const TYPE_LABEL = {aprox:"Aproximación", top:"Top set", bo:"Back-off", bo2:"Back-off 2"};
+const TYPE_LABEL = {aprox:"Aproximación", top:"Top set", bo:"Back-off", bo2:"Back-off 2", ok:"Hecho"};
 const RIR = ["0","1","2","+2"];
 /* RIR objetivo: lo pautás vos (en el objetivo de la serie o por ejercicio) */
 function tRir(ex, s){
-  if (s.type === "aprox") return null;
+  if (s.type === "aprox" || s.type === "ok" || ex.check) return null;
   if (s.rir != null) return String(s.rir);
   const m = String(s.target).match(/RIR\s*(\+?\d)/);
   return m ? m[1] : (ex.rir != null ? String(ex.rir) : null);
@@ -1417,7 +1528,7 @@ function seedHistory(c){
       const d = new Date(now); d.setDate(d.getDate() - (cl.days.length - di) * 2 - (wk !== cl.lastWeek ? 7 : 0)); d.setHours(18,30,0,0);
       out.push({ id:`imp-${day.id}-${cl.seedVer||0}`, ts:d.getTime(), dayId:day.id, dayLabel:day.label, imported:true, week:wk,
         /* Si la semana pasada hizo la opción B (prev cargado en la B), el registro va a nombre de la B */
-        exercises: day.exercises.map(ex0 => ex0.alt && ex0.alt.sets.some(s => s.prev) && !ex0.sets.some(s => s.prev) ? { ...ex0, ...ex0.alt } : ex0).map(ex => ({ name: ex.name, sets: ex.sets.map(s => {
+        exercises: day.exercises.map(ex0 => ex0.alt && ex0.alt.sets.some(s => s.prev) && !ex0.sets.some(s => s.prev) ? { ...ex0, ...ex0.alt } : ex0).map(ex => ({ name: ex.name, check: ex.check || undefined, sets: ex.sets.map(s => {
           const [pr, pl] = String(s.prev || "").split("|"), p = parsePrev(pr), q = ex.uni ? parsePrev(pl || pr) : null;
           return { type:s.type, kg:p.ok ? String(p.kg) : "", reps:p.ok ? String(p.reps) : "", ...(q ? { kgL:q.kg ? String(q.kg) : "", repsL:q.reps ? String(q.reps) : "" } : {}),
             rpe:null, rir:null, tRir:tRir(ex, s), done:p.ok };
@@ -1680,7 +1791,7 @@ function exCard(day, ex, ei){
       ${mediaHTML(ex, `${day.id}-${ei}`)}
       ${ex.cues.map(c=>`<div>• ${esc(c)}</div>`).join("")}
     </div>
-    <button class="add-aprox" data-ei="${ei}">+ Aproximación</button>
+    ${ex.check ? "" : `<button class="add-aprox" data-ei="${ei}">+ Aproximación</button>`}
     ${(sets => sets.map(o => setRow(day,ex,ei,o, o.extra && o.xi === sets.filter(x => x.extra).length - 1)).join(""))(setsOf(day,ex,ei))}
     ${noteHTML(day, ei)}
   </article>`;
@@ -1700,6 +1811,10 @@ function noteHTML(day, ei){
 
 function setRow(day, ex, ei, o, canDel){
   const s = o.s, k = o.k, v = log[k] || {};
+  if (ex.check) return `<div class="set${v.done?" done":""}" data-k="${k}">
+    <div class="set-head"><span class="tag ok">Estiramiento</span><span class="target">${esc(s.target)}</span></div>
+    <div class="ok-row"><label class="field"><span>Segundos <small>(opcional)</small></span><input id="${k}-secs" inputmode="numeric" value="${esc(v.secs??"")}" placeholder="—"></label><button class="check" aria-label="Marcar como hecho" aria-pressed="${!!v.done}">✓ Hecho</button></div>
+  </div>`;
   const tagCls = {aprox:"aprox",top:"top",bo:"bo",bo2:"bo2"}[s.type];
   return `<div class="set${v.done?" done":""}" data-k="${k}">
     <div class="set-head"><span class="tag ${tagCls}">${TYPE_LABEL[s.type]}</span><span class="target">${o.extra ? "Extra · a tu ritmo" : esc(targetTxt(ex, s))}</span>${canDel ? `<button class="del-x" data-ei="${ei}" aria-label="Quitar esta aproximación">Quitar</button>` : ""}</div>
@@ -1733,7 +1848,7 @@ function sidesHTML(day, ei, o, k, v){
 function wireSet(el){
   const k = el.dataset.k;
   const get = () => (log[k] = log[k] || {});
-  ["kg","reps","kgL","repsL"].forEach(f => {
+  ["kg","reps","kgL","repsL","secs"].forEach(f => {
     const inp = document.getElementById(`${k}-${f}`); if (!inp) return;
     inp.addEventListener("input", e => { get()[f] = e.target.value.replace(",", "."); save();
       const sd = f.endsWith("L") ? "L" : "R", b = el.querySelector(`.side[data-s="${sd}"] small`), v = get();
@@ -1831,7 +1946,7 @@ function renderHome(){
 /* ---------- Historial y progreso ---------- */
 function allExercises(){
   const seen = new Set(), out = [];
-  CLIENTS[code].days.forEach(d => d.exercises.forEach(ex => [ex, ex.alt].forEach(x => { if (x && !seen.has(x.name)){ seen.add(x.name); out.push(x.name); } })));
+  CLIENTS[code].days.forEach(d => d.exercises.filter(ex => !ex.check).forEach(ex => [ex, ex.alt].forEach(x => { if (x && !seen.has(x.name)){ seen.add(x.name); out.push(x.name); } })));
   return out;
 }
 /* Por sesión: top set (o la serie efectiva más pesada si no hay top) y volumen efectivo del ejercicio */
@@ -2050,6 +2165,8 @@ function entryPaper(e){
   const cl = CLIENTS[code], day = cl.days.find(d => d.id === e.dayId) || {}, FB = entryFeedback(e), n = entryCounts(e);
   const c = x => x === undefined || x === null || x === "" ? `<td class="miss r">—</td>` : `<td class="r">${esc(x)}</td>`;
   const tables = e.exercises.map((ex, ei) => { const uni = entryUni(ex);
+    if (ex.check){ const done = ex.sets.some(v => v.done), t = (ex.sets[0] || {}).target, sc = (ex.sets[0] || {}).secs;
+      return `<section class="rp-ex"><div class="rp-ex-h"><span class="rp-n">${String(ei+1).padStart(2,"0")}</span><h3>${esc(ex.name)}</h3></div><table><tbody><tr${done ? "" : ` class="skip"`}><td><span class="rp-t ok">${done ? "✓ Hecho" : "No marcado"}</span></td><td class="r">${sc ? `<b>${esc(sc)} s</b> · ` : ""}objetivo ${esc(t || "")}</td></tr></tbody></table>${ex.note ? `<p class="rp-note"><b>Nota:</b> ${esc(ex.note)}</p>` : ""}</section>`; }
     return `<section class="rp-ex"><div class="rp-ex-h"><span class="rp-n">${String(ei+1).padStart(2,"0")}</span><h3>${esc(ex.name)}${ex.opt === "B" ? ` <em class="rp-opt">opción B</em>` : ""}</h3></div>${ex.setupHTML || ""}<table><thead><tr><th>Serie</th><th class="r">Kg</th><th class="r">Reps</th><th class="r">RPE</th><th class="r">Objetivo</th><th class="r">Lectura</th></tr></thead><tbody>${
     ex.sets.map(v => { const tr = v.tRir, rd = rpeRead(v.rpe, tr);
       const has = [v.kg, v.reps, v.kgL, v.repsL].some(hasVal) || v.rpe != null;
@@ -2089,6 +2206,7 @@ function entryText(e){
   e.exercises.forEach(ex => {
     const uni = entryUni(ex);
     L.push("", ex.name.toUpperCase() + (ex.opt === "B" ? " (opción B)" : ""));
+    if (ex.check){ { const sc = (ex.sets[0] || {}).secs; L.push((ex.sets.some(v => v.done) ? "- ✓ Hecho" : "- No marcado") + (sc ? ` · ${sc} s` : "")); } if (ex.note) L.push(`📝 Nota: ${ex.note}`); return; }
     ex.sets.forEach(v => {
       const tr = v.tRir, rd = rpeRead(v.rpe, tr), has = [v.kg, v.reps, v.kgL, v.repsL].some(hasVal);
       if (!has && v.rpe == null){ L.push(`- ${TYPE_LABEL[v.type]}${v.extra ? " extra" : ""}: sin registrar`); return; }
@@ -2135,8 +2253,9 @@ function showSummary(){
   const keys = Object.keys(log).filter(k => k.startsWith(day.id + "-"));
   const snap = {}; keys.forEach(k => snap[k] = log[k]);
   const e = { id: entryId, ts: Date.now(), dayId: day.id, dayLabel: day.label, block: cl.block || undefined, fb: FB,
-    exercises: exs(day).map((ex,ei) => ({ name: ex.name, opt: ex.opt || undefined, note: noteOf(day, ei) || undefined, setupHTML: setupPdf(day, ex, ei) || undefined, sets: setsOf(day,ex,ei).map(o => {
+    exercises: exs(day).map((ex,ei) => ({ name: ex.name, check: ex.check || undefined, opt: ex.opt || undefined, note: noteOf(day, ei) || undefined, setupHTML: setupPdf(day, ex, ei) || undefined, sets: setsOf(day,ex,ei).map(o => {
       const s = o.s, v = log[o.k] || {};
+      if (ex.check) return { type: "ok", target: s.target, secs: hasVal(v.secs) ? String(parseInt(v.secs) || v.secs) : undefined, done: !!v.done };
       return { extra: o.extra || undefined, type: s.type, kg: v.kg ?? "", reps: v.reps ?? "", ...(ex.uni ? { kgL: v.kgL ?? "", repsL: v.repsL ?? "" } : {}), rpe: v.rpe ?? null, rir: v.rir ?? null, tRir: tRir(ex, s), done: !!v.done };
     })})), warm: !!log[day.id + "-warm"], cool: !!log[day.id + "-cool"]
   };
