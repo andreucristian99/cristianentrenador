@@ -499,10 +499,10 @@ const CLIENTS = {
     ]
   },
 
-  /* ---------- Asmaa · rutina de Noviembre S1; "última vez" = 11th week ----------
+  /* ---------- Asmaa · rutina de Noviembre S1; "última vez" = 11th week; Upper = 10thweek (la 11 quedó sin pesos) ----------
      Todo a RIR 2. Si la semana pasada hizo la opción B, el prev va en las series de la B. */
   "627822": {
-    name: "Asmaa", block: "Noviembre · Semana 1", seedVer: 1, lastWeek: "Semana 11",
+    name: "Asmaa", block: "Noviembre · Semana 1", seedVer: 2, lastWeek: "Semana 11",
     days: [
       { id:"L1", label:"Día 1 · Legday", exercises:[
         { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"RRxao7N3pSw", rir:"2", cues:[], sets:[
@@ -528,19 +528,25 @@ const CLIENTS = {
         { name:"Elevación de piernas (abdominales)", img:"fotos/elevacion-piernas.jpg", video:"TDrcxNrcCVs", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]}
       ]},
-      { id:"U1", label:"Día 2 · Upper", exercises:[
+      { id:"U1", label:"Día 2 · Upper", lastWeek:"Semana 10", exercises:[
         { name:"Fondos en máquina de placas", img:"fotos/fondos-placas.jpg", video:"dEaa8tvJ7TY", rir:"2", cues:[], sets:[
-          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ],
+          {type:"top", target:"10 reps", prev:"29×12"},
+          {type:"bo", target:"10 reps", prev:"29×12"},
+          {type:"bo2", target:"10 reps", prev:"23×10"} ],
           alt:{ name:"Fondos en máquina de placas (zona de circuitos)", sets:[
             {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]}},
         { name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", video:"uJjsRoLfyng", rir:"2", cues:[], sets:[
-          {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ],
+          {type:"top", target:"8 reps", prev:"11×15"},
+          {type:"bo", target:"10 reps", prev:"11×11"},
+          {type:"bo2", target:"10 reps", prev:"6,6×15"} ],
           alt:{ name:"Press plano en máquina de placas (al lado de los aductores)", img:"fotos/press-plano-aductores.jpg", sets:[
             {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]}},
         { name:"Vuelos laterales con mancuernas", video:"PCBC4jessEU", wide:true, rir:"2", cues:[], sets:[
-          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]},
+          {type:"top", target:"10 reps", prev:"3×20"},
+          {type:"bo", target:"10 reps", prev:"3×20"} ]},
         { name:"Press militar en máquina de placas", img:"fotos/press-militar-placas.jpg", video:"oUDnqyu2ZIE", rir:"2", cues:[], sets:[
-          {type:"top", target:"8 reps"}, {type:"bo", target:"10 reps"} ]},
+          {type:"top", target:"8 reps", prev:"13×5"},
+          {type:"bo", target:"10 reps", prev:"9×10"} ]},
         { name:"Jalón al pecho en máquina de placas", img:"fotos/jalon-placas.jpg", video:"VPIcgV_i0VQ", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ],
           alt:{ name:"Jalón al pecho en máquina de placas (zona de circuitos)", img:"fotos/jalon-placas-circuitos.jpg", sets:[
