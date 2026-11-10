@@ -1405,6 +1405,59 @@ const CLIENTS = {
           {type:"bo2", target:"10 reps"} ]}
       ]}
     ]
+  },
+
+  /* ---------- Almudena · rutina S2 (principiante, sin registros previos ni setup) ----------
+     Todo a RIR 2. Día 1 = Fullbody con Cris en VivaGym (opción B solo en ext. cuádriceps y press plano, como en su Sheet).
+     Día 2 = Fullbody en casa: la movilidad va en el bloque de calentamiento (con sus vídeos), la plancha se marca como hecha
+     (3 × 1 min) y el resto se registra en kg y reps. Remo con banda: sin kg. Puente de glúteos y abductor: unilaterales por pierna. */
+  "906013": {
+    name: "Almudena", block: "Semana 1", seedVer: 1, fresh: true,
+    days: [
+      { id:"F1", label:"Día 1 · Fullbody con Cris", exercises:[
+        { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"ap1RsdCzZN4", rir:"2", cues:[], sets:[
+          {type:"top", target:"12–15 reps"}, {type:"bo", target:"12–15 reps"}, {type:"bo2", target:"12–15 reps"} ],
+          alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", sets:[
+            {type:"top", target:"12–15 reps"}, {type:"bo", target:"12–15 reps"}, {type:"bo2", target:"12–15 reps"} ]}},
+        { name:"Sentadilla goblet", video:"yTDROg8zZsU", rir:"2", cues:[], sets:[
+          {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"}, {type:"bo2", target:"12 reps"} ]},
+        { name:"Peso muerto rumano con barra", video:"5rIqP63yWFg", memo:["PESO: KILOS TOTAL CONTANDO LA BARRA"], rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]},
+        { name:"Press plano en máquina de placas (al lado de los baños)", img:"fotos/press-plano-banos.jpg", video:"2awX3rTGa1k", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ],
+          alt:{ name:"Press plano en máquina de placas (al lado de los aductores)", img:"fotos/press-plano-aductores.jpg", sets:[
+            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
+        { name:"Vuelos laterales con mancuernas", video:"lvUvnvXgh-Y", rir:"2", cues:[], sets:[
+          {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ]},
+        { name:"Jalón al pecho en polea", img:"fotos/jalon-polea.jpg", video:"5DjncBCRy2c", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]},
+        { name:"Remo en polea", img:"fotos/remo-polea.jpg", video:"HJw0-W-cQog", rir:"2", cues:[], sets:[
+          {type:"top", target:"8–10 reps"}, {type:"bo", target:"8–10 reps"} ]}
+      ]},
+      { id:"C1", label:"Día 2 · Fullbody en casa", home:true,
+        warm:[
+          {n:"Movilidad isquiosurales", t:"2 min", url:"https://www.youtube.com/watch?v=gxdctqpEEfw"},
+          {n:"Estirar isquios", t:"2 min", url:"https://www.youtube.com/shorts/K0WNeH9ivkw"},
+          {n:"Dorsiflexión con banda elástica", t:"10 reps cada pierna", url:"https://www.youtube.com/shorts/Re7XMKgAti8"},
+          {n:"Movilidad de cadera", t:"2 min", url:"https://www.youtube.com/shorts/3eFPPyq5DXk"},
+          {n:"Movilidad tren superior y pélvica", t:"4 min", url:"https://www.youtube.com/shorts/1wg1Ha5X4_k"},
+          {n:"Flexión plantar", t:"2 min", url:"https://www.youtube.com/shorts/B0T3hFtJfTg"} ], exercises:[
+        { name:"Plancha", check:true, checkTag:"Plancha", cues:[], sets:[
+          {type:"ok", target:"1 minuto"}, {type:"ok", target:"1 minuto"}, {type:"ok", target:"1 minuto"} ]},
+        { name:"Curl martillo sentada", video:"mOGAWVA_Bz0", rir:"2", cues:[], sets:[
+          {type:"top", target:"10–12 reps"}, {type:"bo", target:"10–12 reps"}, {type:"bo2", target:"10–12 reps"} ]},
+        { name:"Press francés", video:"C4jBxuNd9kc", rir:"2", cues:[], sets:[
+          {type:"top", target:"10–12 reps"}, {type:"bo", target:"10–12 reps"}, {type:"bo2", target:"10–12 reps"} ]},
+        { name:"Remo con banda elástica", video:"a5YQ-4jm2-U", wide:true, memo:["Con banda: deja los kg vacíos y anota solo las reps"], rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]},
+        { name:"Puente de glúteos unilateral", video:"TCAWZbdNroA", uni:true, limb:"Pierna", memo:["Sin peso: deja los kg vacíos"], rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]},
+        { name:"Abductor con mancuerna unilateral", video:"xgJebm7J5lY", uni:true, limb:"Pierna", rir:"2", cues:[], sets:[
+          {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"}, {type:"bo2", target:"12 reps"} ]},
+        { name:"Abs crunch en colchoneta", video:"dNuGXV0nXGA", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]}
+      ]}
+    ]
   }
 };
 /* Fotos de tus bibliotecas de máquinas */
@@ -1784,7 +1837,7 @@ function setupPdf(day, ex, ei){
 }
 
 function optHTML(day, ex, ei){
-  if (!day.exercises[ei].alt) return `<div class="opt-none">Sin opción B: si está ocupada, espera a que se libere</div>`;
+  if (!day.exercises[ei].alt){ if (day.home) return ""; return `<div class="opt-none">Sin opción B: si está ocupada, espera a que se libere</div>`; }
   return `<div class="opt" role="group" aria-label="Opción del ejercicio">
     <button class="opt-b" data-ei="${ei}" data-o="A" aria-pressed="${ex.opt !== "B"}">Opción A</button>
     <button class="opt-b" data-ei="${ei}" data-o="B" aria-pressed="${ex.opt === "B"}">Opción B<small>si la A está ocupada</small></button>
@@ -1822,7 +1875,7 @@ function noteHTML(day, ei){
 function setRow(day, ex, ei, o, canDel){
   const s = o.s, k = o.k, v = log[k] || {};
   if (ex.check) return `<div class="set${v.done?" done":""}" data-k="${k}">
-    <div class="set-head"><span class="tag ok">Estiramiento</span><span class="target">${esc(s.target)}</span></div>
+    <div class="set-head"><span class="tag ok">${esc(ex.checkTag || "Estiramiento")}</span><span class="target">${esc(s.target)}</span></div>
     <div class="ok-row"><label class="field"><span>Segundos <small>(opcional)</small></span><input id="${k}-secs" inputmode="numeric" value="${esc(v.secs??"")}" placeholder="—"></label><button class="check" aria-label="Marcar como hecho" aria-pressed="${!!v.done}">✓ Hecho</button></div>
   </div>`;
   const tagCls = {aprox:"aprox",top:"top",bo:"bo",bo2:"bo2"}[s.type];
