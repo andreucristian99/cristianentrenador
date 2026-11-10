@@ -1409,7 +1409,7 @@ const CLIENTS = {
 
   /* ---------- Almudena · rutina S2 (principiante, sin registros previos ni setup) ----------
      Todo a RIR 2. Día 1 = Fullbody con Cris en VivaGym (opción B solo en ext. cuádriceps y press plano, como en su Sheet).
-     Día 2 = Fullbody en casa: la movilidad va en el bloque de calentamiento (con sus vídeos), la plancha se marca como hecha
+     Día 2 = Fullbody en casa: cada movilidad es un ejercicio aparte con su vídeo y su "Hecho", la plancha se marca como hecha
      (3 × 1 min) y el resto se registra en kg y reps. Remo con banda: sin kg. Puente de glúteos y abductor: unilaterales por pierna. */
   "906013": {
     name: "Almudena", block: "Semana 1", seedVer: 1, fresh: true,
@@ -1434,15 +1434,20 @@ const CLIENTS = {
         { name:"Remo en polea", img:"fotos/remo-polea.jpg", video:"HJw0-W-cQog", rir:"2", cues:[], sets:[
           {type:"top", target:"8–10 reps"}, {type:"bo", target:"8–10 reps"} ]}
       ]},
-      { id:"C1", label:"Día 2 · Fullbody en casa", home:true,
-        warm:[
-          {n:"Movilidad isquiosurales", t:"2 min", url:"https://www.youtube.com/watch?v=gxdctqpEEfw"},
-          {n:"Estirar isquios", t:"2 min", url:"https://www.youtube.com/shorts/K0WNeH9ivkw"},
-          {n:"Dorsiflexión con banda elástica", t:"10 reps cada pierna", url:"https://www.youtube.com/shorts/Re7XMKgAti8"},
-          {n:"Movilidad de cadera", t:"2 min", url:"https://www.youtube.com/shorts/3eFPPyq5DXk"},
-          {n:"Movilidad tren superior y pélvica", t:"4 min", url:"https://www.youtube.com/shorts/1wg1Ha5X4_k"},
-          {n:"Flexión plantar", t:"2 min", url:"https://www.youtube.com/shorts/B0T3hFtJfTg"} ], exercises:[
-        { name:"Plancha", check:true, checkTag:"Plancha", cues:[], sets:[
+      { id:"C1", label:"Día 2 · Fullbody en casa", home:true, exercises:[
+        { name:"Movilidad isquiosurales", check:true, checkTag:"Movilidad", video:"gxdctqpEEfw", wide:true, cues:[], sets:[
+          {type:"ok", target:"2 minutos"} ]},
+        { name:"Estirar isquios", check:true, checkTag:"Movilidad", video:"K0WNeH9ivkw", cues:[], sets:[
+          {type:"ok", target:"2 minutos"} ]},
+        { name:"Dorsiflexión con banda elástica", check:true, checkTag:"Movilidad", video:"Re7XMKgAti8", cues:[], sets:[
+          {type:"ok", target:"10 reps cada pierna"} ]},
+        { name:"Movilidad de cadera", check:true, checkTag:"Movilidad", video:"3eFPPyq5DXk", cues:[], sets:[
+          {type:"ok", target:"2 minutos"} ]},
+        { name:"Movilidad tren superior y pélvica", check:true, checkTag:"Movilidad", video:"1wg1Ha5X4_k", cues:[], sets:[
+          {type:"ok", target:"4 minutos"} ]},
+        { name:"Flexión plantar", check:true, checkTag:"Movilidad", video:"B0T3hFtJfTg", cues:[], sets:[
+          {type:"ok", target:"2 minutos"} ]},
+        { name:"Plancha", check:true, checkTag:"Plancha", video:"3AM7L2k7BEw", cues:[], sets:[
           {type:"ok", target:"1 minuto"}, {type:"ok", target:"1 minuto"}, {type:"ok", target:"1 minuto"} ]},
         { name:"Curl martillo sentada", video:"mOGAWVA_Bz0", rir:"2", cues:[], sets:[
           {type:"top", target:"10–12 reps"}, {type:"bo", target:"10–12 reps"}, {type:"bo2", target:"10–12 reps"} ]},
@@ -1452,7 +1457,7 @@ const CLIENTS = {
           {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]},
         { name:"Puente de glúteos unilateral", video:"TCAWZbdNroA", uni:true, limb:"Pierna", memo:["Sin peso: deja los kg vacíos"], rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]},
-        { name:"Abductor con mancuerna unilateral", video:"xgJebm7J5lY", uni:true, limb:"Pierna", rir:"2", cues:[], sets:[
+        { name:"Abductor con mancuerna unilateral", video:"xgJebm7J5lY", uni:true, limb:"Pierna", memo:["Sin peso: deja los kg vacíos y anota solo las reps"], rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"}, {type:"bo2", target:"12 reps"} ]},
         { name:"Abs crunch en colchoneta", video:"dNuGXV0nXGA", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]}
