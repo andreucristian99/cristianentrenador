@@ -1503,13 +1503,23 @@ function login(c){
     saveHist(); store.set("ce-seedver-" + c, ver);
   }
   mySetup = store.get("ce-setup-" + c) || {};
-  view = "home";
+  /* Si Android cerró la página al bloquear el móvil, vuelve a la misma pantalla, día y posición */
+  const pos = store.get("ce-pos-" + c);
+  const fresh = pos && Date.now() - (pos.ts || 0) < 6 * 3600 * 1000;
+  view = fresh && ["home","train","hist"].includes(pos.view) ? pos.view : "home";
+  dayIdx = fresh && CLIENTS[c].days[pos.day] ? pos.day : 0;
   render();
+  if (fresh && pos.y) requestAnimationFrame(() => window.scrollTo(0, pos.y));
 }
-function logout(){ store.del("ce-code"); code = null; renderLogin(); }
+function savePos(){ if (code) store.set("ce-pos-" + code, { view, day: dayIdx, y: Math.round(window.scrollY), ts: Date.now() }); }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") savePos(); });
+window.addEventListener("pagehide", savePos);
+let posT = 0;
+window.addEventListener("scroll", () => { clearTimeout(posT); posT = setTimeout(savePos, 300); }, { passive: true });
+function logout(){ if (code) store.del("ce-pos-" + code); store.del("ce-code"); code = null; renderLogin(); }
 function save(){ store.set("ce-log-" + code, log); }
 function saveHist(){ store.set("ce-hist-" + code, hist); }
-function render(){ view === "hist" ? renderHistory() : view === "train" ? renderSession() : renderHome(); }
+function render(){ view === "hist" ? renderHistory() : view === "train" ? renderSession() : renderHome(); savePos(); }
 
 /* ---------- Historial: utilidades ---------- */
 const parsePrev = p => { const m = String(p).replace(",", ".").match(/([\d.]+)\s*×\s*(\d+)/); return m ? {kg:+m[1], reps:+m[2], ok:true} : {kg:0, reps:0, ok:false}; };
@@ -1639,7 +1649,7 @@ function renderSession(){
   <div class="finish-bar"><button class="btn" id="finish">Terminar sesión</button></div>`;
 
   wireHeader();
-  app.querySelectorAll(".day").forEach(b => b.onclick = () => { dayIdx = +b.dataset.day; renderSession(); window.scrollTo(0,0); });
+  app.querySelectorAll(".day").forEach(b => b.onclick = () => { dayIdx = +b.dataset.day; renderSession(); window.scrollTo(0,0); savePos(); });
   app.querySelectorAll(".see").forEach(b => b.onclick = () => {
     const p = document.getElementById(b.getAttribute("aria-controls")); p.hidden = !p.hidden;
     if (!p.hidden){ const vp = p.querySelector('[data-pane="v"]'); if (vp && !vp.hidden) loadShort(p); } else unloadShort(p);
