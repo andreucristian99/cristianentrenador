@@ -405,7 +405,7 @@ button{cursor:pointer}
    La opción B hereda el vídeo de la A (mismo patrón de movimiento) salvo que se indique otro.
    prev = lo que hizo la semana anterior (kg×reps). img = foto de la máquina (carpeta fotos/). */
 const CLIENTS = {
-  /* ---------- Jesús · rutina de Noviembre S1; "última vez" = Octubre S4 (solo opción A) ---------- */
+  /* ---------- Jesús · rutina de Noviembre S1 (ajustada el 11 nov: Legday sin ext. lumbar, curl femoral 3º, prensa 4º, ext. cuádriceps 8–10; Upper B press inclinado a 2 series y curl Scott en máquina tras el Scott al revés); "última vez" = Octubre S4 (solo opción A) ---------- */
   "418263": {
     name: "Jesús", block: "Noviembre · Semana 1", seedVer: 1, lastWeek: "Octubre · Semana 4",
     days: [
@@ -445,30 +445,25 @@ const CLIENTS = {
       ]},
       { id:"L1", label:"Día 2 · Legday A", exercises:[
         { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"RRxao7N3pSw", setup:"Respaldo 7 / 12 / 4", rir:"2", cues:[], sets:[
-          {type:"top", target:"12 reps", prev:"77×15"},
-          {type:"bo", target:"12 reps", prev:"84×15"} ],
+          {type:"top", target:"8–10 reps", prev:"77×15"},
+          {type:"bo", target:"8–10 reps", prev:"84×15"} ],
           alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", setup:null, sets:[
-            {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ]}},
+            {type:"top", target:"8–10 reps"}, {type:"bo", target:"8–10 reps"} ]}},
         { name:"Hack squat", img:"fotos/hack-squat.jpg", video:"rYgNArpwE7E", wide:true, rir:"2", cues:[], sets:[
           {type:"top", target:"6 reps", prev:"10×12"},
           {type:"bo", target:"8 reps", prev:"10×12"} ],
           alt:{ name:"Hack squat", sets:[
             {type:"top", target:"6 reps"}, {type:"bo", target:"8 reps"} ]}},
-        { name:"Prensa inclinada", img:"fotos/prensa-inclinada.jpg", video:"VztOTDLqs7w", setup:"Banco a 10°, máximo estiramiento", rir:"2", cues:[], sets:[
-          {type:"top", target:"7 reps", prev:"60×12"},
-          {type:"bo", target:"10 reps", prev:"60×13"} ],
-          alt:{ name:"Prensa inclinada", sets:[
-            {type:"top", target:"7 reps"}, {type:"bo", target:"10 reps"} ]}},
-        { name:"Extensión lumbar", img:"fotos/extension-lumbar.jpg", video:"_lrQxyQd7A8", setup:"Nivel 3", rir:"2", cues:[], sets:[
-          {type:"top", target:"12 reps", prev:"0×11"},
-          {type:"bo", target:"12 reps", prev:"0×12"} ],
-          alt:{ name:"Extensión lumbar", sets:[
-            {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ]}},
         { name:"Curl femoral sentado con respaldo", img:"fotos/curl-femoral-respaldo.jpg", video:"6IvQvWZmEsw", setup:"Asiento 7, rodillo 4", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"84×15"},
           {type:"bo", target:"10 reps"} ],
           alt:{ name:"Curl femoral sentado sin respaldo", img:"fotos/curl-femoral-sin-respaldo.jpg", setup:null, sets:[
             {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"} ]}},
+        { name:"Prensa inclinada", img:"fotos/prensa-inclinada.jpg", video:"VztOTDLqs7w", setup:"Banco a 10°, máximo estiramiento", rir:"2", cues:[], sets:[
+          {type:"top", target:"7 reps", prev:"60×12"},
+          {type:"bo", target:"10 reps", prev:"60×13"} ],
+          alt:{ name:"Prensa inclinada", sets:[
+            {type:"top", target:"7 reps"}, {type:"bo", target:"10 reps"} ]}},
         { name:"RDL", video:"0XL4cZR2Ink", wide:true, rir:"2", cues:[], sets:[
           {type:"top", target:"6 reps"},
           {type:"bo", target:"8 reps"} ],
@@ -478,8 +473,7 @@ const CLIENTS = {
       { id:"U2", label:"Día 3 · Upper B", exercises:[
         { name:"Press inclinado con mancuernas", video:"J_x6MEFk3DM", setup:"Banco inclinado a 30°", rir:"2", cues:[], sets:[
           {type:"top", target:"6 reps", prev:"10×10"},
-          {type:"bo", target:"8 reps", prev:"8×10"},
-          {type:"bo2", target:"8 reps", prev:"8×12"} ]},
+          {type:"bo", target:"8 reps", prev:"8×10"} ]},
         { name:"Press plano con mancuernas", video:"R3eCn7-9wC0", setup:"Banco a 0°", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"8×10"},
           {type:"bo", target:"10 reps", prev:"8×10"} ]},
@@ -498,6 +492,9 @@ const CLIENTS = {
             {type:"top", target:"12 reps"}, {type:"bo", target:"12 reps"} ]}},
         { name:"Curl de bíceps en banco Scott al revés", video:"FgXEfaN8D3c", setup:"Banco 3 (dentro), 2 sobresaliendo", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"8×10"},
+          {type:"bo", target:"10 reps"} ]},
+        { name:"Curl de bíceps Scott en máquina", img:"fotos/curl-biceps-maquina.jpg", video:"VBT3DOG5V08", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"},
           {type:"bo", target:"10 reps"} ]},
         { name:"Vuelos laterales", video:"ti5hxR7kB10", rir:"2", cues:[], sets:[
           {type:"top", target:"12 reps + parciales"},
