@@ -828,7 +828,7 @@ const CLIENTS = {
      Todo a RIR 2. Excel: tabla izquierda = opción A, derecha = opción B (si es el mismo ejercicio, no hay B).
      Crunch D1: A sin máquina (reps), B en máquina con los kg del D2. Búlgara unilateral: "8kgx10i10d". */
   "257238": {
-    name: "Elisa", block: "Noviembre · Semana 1", seedVer: 3, lastWeek: "Octubre · última semana",
+    name: "Elisa", block: "Noviembre · Semana 1", seedVer: 4, lastWeek: "Octubre · última semana",
     days: [
       { id:"U1", label:"Día 1 · Upper", coolTitle:"Para terminar",
         memo:["Remo en máquina de placas y poleas: 23 kg × 10 × 10 × 10", "Press francés: 4 kg × 10 × 10"],
@@ -865,27 +865,28 @@ const CLIENTS = {
             {type:"bo2", target:"10 reps", prev:"27×10"} ]}}
       ]},
       { id:"L1", label:"Día 2 · Legday", exercises:[
+        { name:"Extensión de gemelos en prensa horizontal", img:"fotos/prensa-horizontal.jpg", video:"ZFephCP1AXU", rir:"2", cues:[], sets:[
+          {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]},
         { name:"Extensión de cuádriceps con respaldo", img:"fotos/ext-cuadriceps-respaldo.jpg", video:"RRxao7N3pSw", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
-          {type:"top", target:"12–15 reps", prev:"45×10"},
-          {type:"bo", target:"12–15 reps", prev:"45×10"},
-          {type:"bo2", target:"12–15 reps", prev:"45×10"} ],
+          {type:"top", target:"10–12 reps", prev:"45×10"},
+          {type:"bo", target:"10–12 reps", prev:"45×10"},
+          {type:"bo2", target:"10–12 reps", prev:"45×10"} ],
           alt:{ name:"Extensión de cuádriceps sin respaldo", img:"fotos/ext-cuadriceps-sin-respaldo.jpg", sets:[
-            {type:"top", target:"12–15 reps"}, {type:"bo", target:"12–15 reps"}, {type:"bo2", target:"12–15 reps"} ]}},
-        { name:"Hack squat", img:"fotos/hack-squat.jpg", video:"9E0oA25ZBlo", setup:"Peso = total de discos (sin la máquina)", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
-          {type:"top", target:"8 reps", prev:"10×8"},
-          {type:"bo", target:"10 reps", prev:"10×8"} ]},
+            {type:"top", target:"10–12 reps"}, {type:"bo", target:"10–12 reps"}, {type:"bo2", target:"10–12 reps"} ]}},
         { name:"Sentadilla búlgara con mancuernas", video:"t4-_udCqwqI", uni:true, limb:"Pierna", rir:"2", cues:[], sets:[
-          {type:"top", target:"8 reps", prev:"8×10|8×10"} ]},
+          {type:"top", target:"10–12 reps", prev:"8×10|8×10"} ]},
         { name:"Extensión lumbar", img:"fotos/extension-lumbar.jpg", video:"_lrQxyQd7A8", setup:"Nivel de asiento 6", rir:"2", cues:[], sets:[
-          {type:"top", target:"10 reps", prev:"10×10"},
-          {type:"bo", target:"10 reps", prev:"10×10"} ]},
+          {type:"top", target:"10–12 reps", prev:"10×10"},
+          {type:"bo", target:"10–12 reps", prev:"10×10"} ]},
         { name:"Peso muerto rumano con barra", video:"3u9M3nh0C0g", setup:"Rack nivel 16", rir:"2", cues:["Antes: 1 serie de aproximación"], sets:[
           {type:"top", target:"5 reps", prev:"50×4"},
           {type:"bo", target:"8 reps"} ]},
         { name:"Abdominales crunch en máquina", img:"fotos/abdominales-crunch.jpg", video:"b6ONE9Rfgl8", rir:"2", cues:[], sets:[
           {type:"top", target:"10 reps", prev:"22,5×10"},
           {type:"bo", target:"10 reps", prev:"27×10"},
-          {type:"bo2", target:"10 reps", prev:"27×10"} ]}
+          {type:"bo2", target:"10 reps", prev:"27×10"} ],
+          alt:{ name:"Abs crunch en colchoneta", img:null, video:"dNuGXV0nXGA", sets:[
+            {type:"top", target:"10 reps"}, {type:"bo", target:"10 reps"}, {type:"bo2", target:"10 reps"} ]}}
       ]},
       { id:"F1", label:"Día 3 · Fullbody", exercises:[
         { name:"Abdominales crunch en máquina", img:"fotos/abdominales-crunch.jpg", video:"b6ONE9Rfgl8", rir:"2", cues:[], sets:[
