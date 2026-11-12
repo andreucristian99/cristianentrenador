@@ -1710,8 +1710,8 @@ function render(){ view === "hist" ? renderHistory() : view === "train" ? render
 /* ---------- Historial: utilidades ---------- */
 const parsePrev = p => { const t = String(p).replace(",", "."), m = t.match(/([\d.]+)\s*×\s*(\d+)/); if (m) return {kg:+m[1], reps:+m[2], ok:true};
   const r = t.trim().match(/^(\d+)$/); return r ? {kg:0, reps:+r[1], ok:true} : {kg:0, reps:0, ok:false}; };
-/* Abdominales crunch en colchoneta (sin "máquina" en el nombre): solo reps, sin kilos */
-const repsOnly = ex => !!ex && /crunch/i.test(ex.name || "") && !/m[aá]quina/i.test(ex.name || "");
+/* Abdominales a peso corporal: crunch sin "máquina" en el nombre, con ruedita o en paralelas → solo reps, sin kilos */
+const repsOnly = ex => !!ex && ((/crunch/i.test(ex.name || "") && !/m[aá]quina/i.test(ex.name || "")) || /ruedita|paralelas/i.test(ex.name || ""));
 const fmt = n => (+n).toLocaleString("es-ES", {maximumFractionDigits:1});
 const n0 = v => parseFloat(v) || 0;
 
