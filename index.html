@@ -2415,7 +2415,7 @@ function entryText(e){
   return L.join("\n");
 }
 /* Botones de compartir (imagen, PDF, WhatsApp, copiar) sobre un informe ya montado */
-function wireShare(sh, e){
+function wireShare(sh, e, onShared){
   const cl = CLIENTS[code], note = sh.querySelector("#share-note"), TXT = entryText(e);
   const imgBtn = sh.querySelector("#img");
   const slug = t => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -2430,7 +2430,11 @@ function wireShare(sh, e){
   imgBtn.onclick = async () => {
     if (!rep) return;
     const out = await shareFile(new File([rep.blob], base + ".png", { type: "image/png" }));
-    if (out === "shared") note.textContent = "Listo ✓ Si la guardaste en Fotos, mándasela a Cristian por WhatsApp.";
+    /* Compartida: se cierra sola (y vuelve al inicio al terminar sesión), sin tener que tocar "Listo" */
+    if (out === "shared"){
+      if (onShared){ onShared(); toast("Imagen compartida ✓ ¡Buen entreno!"); }
+      else note.textContent = "Listo ✓ Si la guardaste en Fotos, mándasela a Cristian por WhatsApp.";
+    }
     else if (out === "fallback") showReportImage(rep.blob);
   };
 }
@@ -2479,7 +2483,7 @@ function showSummary(){
     Object.assign(log, snap); save(); sh.remove(); renderSession();
     toast("Listo, sigues con la sesión donde la dejaste");
   };
-  wireShare(sh, e);
+  wireShare(sh, e, close);
 }
 
 /* Reabrir el informe de una sesión ya guardada (desde Historial) para volver a compartirlo */
@@ -2495,7 +2499,7 @@ function showSavedReport(e){
   const close = () => sh.remove();
   sh.querySelector("#close").onclick = close;
   sh.addEventListener("click", ev => { if (ev.target === sh) close(); });
-  wireShare(sh, e);
+  wireShare(sh, e, close);
 }
 
 /* ---------- Imagen del informe (PNG) ---------- */
