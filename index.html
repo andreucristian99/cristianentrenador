@@ -90,6 +90,7 @@ button{cursor:pointer}
 .target{font-size:14px;font-weight:600}
 .prev{font-size:12px;color:var(--muted);margin-left:auto}
 .nums{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.9fr) 44px;gap:6px}
+.nums.ro{grid-template-columns:minmax(0,1fr) minmax(0,1.9fr) 44px}
 .last{align-self:end;min-height:46px;border-radius:10px;background:var(--bg);border:1px dashed var(--line);padding:4px 8px;display:flex;flex-direction:column;justify-content:center;min-width:0;line-height:1.2}
 .last-lab{font-size:9.5px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .last-v{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1707,7 +1708,10 @@ function saveHist(){ store.set("ce-hist-" + code, hist); }
 function render(){ view === "hist" ? renderHistory() : view === "train" ? renderSession() : renderHome(); savePos(); }
 
 /* ---------- Historial: utilidades ---------- */
-const parsePrev = p => { const m = String(p).replace(",", ".").match(/([\d.]+)\s*×\s*(\d+)/); return m ? {kg:+m[1], reps:+m[2], ok:true} : {kg:0, reps:0, ok:false}; };
+const parsePrev = p => { const t = String(p).replace(",", "."), m = t.match(/([\d.]+)\s*×\s*(\d+)/); if (m) return {kg:+m[1], reps:+m[2], ok:true};
+  const r = t.trim().match(/^(\d+)$/); return r ? {kg:0, reps:+r[1], ok:true} : {kg:0, reps:0, ok:false}; };
+/* Abdominales crunch en colchoneta (sin "máquina" en el nombre): solo reps, sin kilos */
+const repsOnly = ex => !!ex && /crunch/i.test(ex.name || "") && !/m[aá]quina/i.test(ex.name || "");
 const fmt = n => (+n).toLocaleString("es-ES", {maximumFractionDigits:1});
 const n0 = v => parseFloat(v) || 0;
 
@@ -1725,7 +1729,7 @@ function seedHistory(c){
         /* Si la semana pasada hizo la opción B (prev cargado en la B), el registro va a nombre de la B */
         exercises: day.exercises.map(ex0 => ex0.alt && ex0.alt.sets.some(s => s.prev) && !ex0.sets.some(s => s.prev) ? { ...ex0, ...ex0.alt } : ex0).map(ex => ({ name: ex.name, check: ex.check || undefined, sets: ex.sets.map(s => {
           const [pr, pl] = String(s.prev || "").split("|"), p = parsePrev(pr), q = ex.uni ? parsePrev(pl || pr) : null;
-          return { type:s.type, kg:p.ok ? String(p.kg) : "", reps:p.ok ? String(p.reps) : "", ...(q ? { kgL:q.kg ? String(q.kg) : "", repsL:q.reps ? String(q.reps) : "" } : {}),
+          return { type:s.type, kg:p.ok && !repsOnly(ex) ? String(p.kg) : "", reps:p.ok ? String(p.reps) : "", ...(q ? { kgL:q.kg ? String(q.kg) : "", repsL:q.reps ? String(q.reps) : "" } : {}),
             rpe:null, rir:null, tRir:tRir(ex, s), done:p.ok };
         })}))
       });
@@ -1753,7 +1757,7 @@ const setVol = v => n0(v.kg) * (parseInt(v.reps)||0) + n0(v.kgL) * (parseInt(v.r
 const hasVal = x => x != null && x !== "";
 /* Texto kg × reps; en unilaterales "D 12,5×10 · I 12,5×11" */
 function kgx(v, uni){
-  const one = (kg, r) => `${hasVal(kg) ? fmt(+kg) : "—"} kg × ${hasVal(r) ? r : "—"}`;
+  const one = (kg, r) => !(hasVal(kg) && +kg) && hasVal(r) ? `${r} reps` : `${hasVal(kg) ? fmt(+kg) : "—"} kg × ${hasVal(r) ? r : "—"}`;
   if (!uni) return one(v.kg, v.reps);
   return `D ${one(v.kg, v.reps)} · I ${one(v.kgL, v.repsL)}`;
 }
@@ -1777,23 +1781,23 @@ function lastFor(dayId, ei, type, ord, name){
     const e = hist[i]; if (e.dayId !== dayId) continue;
     const ex = e.exercises[ei]; if (!ex || (name && ex.name !== name)) continue;
     const s = ex.sets.filter(x => x.type === type)[ord];
-    if (s && s.done && ((s.kg !== "" && s.reps !== "") || (hasVal(s.kgL) && hasVal(s.repsL)))) return { ts: e.ts, kg: s.kg, reps: s.reps, kgL: s.kgL, repsL: s.repsL, rir: s.rir, rpe: s.rpe };
+    if (s && s.done && (((s.kg !== "" || repsOnly(ex)) && s.reps !== "") || (hasVal(s.kgL) && hasVal(s.repsL)))) return { ts: e.ts, kg: s.kg, reps: s.reps, kgL: s.kgL, repsL: s.repsL, rir: s.rir, rpe: s.rpe };
   }
   /* Si A y B traen "última vez" del Excel, el historial guarda la A; la B la saca de su prev */
   const day = CLIENTS[code].days.find(d => d.id === dayId), ex0 = day && day.exercises[ei];
   if (ex0 && ex0.alt && name && ex0.alt.name === name && ex0.sets.some(x => x.prev)){
     const s = ex0.alt.sets.filter(x => x.type === type)[ord], p = s && s.prev ? parsePrev(s.prev) : null;
     const imp = hist.find(e => e.imported && e.dayId === dayId);
-    if (p && p.ok) return { ts: imp ? imp.ts : Date.now(), kg: String(p.kg), reps: String(p.reps), rir: null, rpe: null };
+    if (p && p.ok) return { ts: imp ? imp.ts : Date.now(), kg: repsOnly(ex0.alt) ? "" : String(p.kg), reps: String(p.reps), rir: null, rpe: null };
   }
   return null;
 }
 const shortDate = ts => new Date(ts).toLocaleDateString("es-ES", {day:"numeric", month:"short"}).replace(".", "");
 function lastHTML(l, side){
   if (l && side === "L") l = hasVal(l.kgL) && hasVal(l.repsL) ? { ...l, kg: l.kgL, reps: l.repsL } : null;
-  else if (l && !(hasVal(l.kg) && hasVal(l.reps))) l = null;
+  else if (l && !hasVal(l.reps)) l = null;
   if (!l) return `<div class="last"><span class="last-lab">Última vez</span><span class="last-v">Sin registro aún</span></div>`;
-  return `<div class="last"><span class="last-lab">Última vez · ${esc(shortDate(l.ts))}</span><span class="last-v num">${esc(fmt(l.kg))} kg × ${esc(l.reps)}</span>${l.rpe != null ? `<span class="last-x num">RPE ${esc(l.rpe)}</span>` : l.rir != null ? `<span class="last-x num">RPE —</span>` : ""}</div>`;
+  return `<div class="last"><span class="last-lab">Última vez · ${esc(shortDate(l.ts))}</span><span class="last-v num">${hasVal(l.kg) && +l.kg ? `${esc(fmt(l.kg))} kg × ${esc(l.reps)}` : `${esc(l.reps)} reps`}</span>${l.rpe != null ? `<span class="last-x num">RPE ${esc(l.rpe)}</span>` : l.rir != null ? `<span class="last-x num">RPE —</span>` : ""}</div>`;
 }
 
 /* ---------- Pantalla de sesión ---------- */
@@ -2013,8 +2017,8 @@ function setRow(day, ex, ei, o, canDel){
   const tagCls = {aprox:"aprox",top:"top",bo:"bo",bo2:"bo2"}[s.type];
   return `<div class="set${v.done?" done":""}" data-k="${k}">
     <div class="set-head"><span class="tag ${tagCls}">${TYPE_LABEL[s.type]}</span><span class="target">${o.extra ? "Extra · a tu ritmo" : esc(targetTxt(ex, s))}</span>${canDel ? `<button class="del-x" data-ei="${ei}" aria-label="Quitar esta aproximación">Quitar</button>` : ""}</div>
-    ${ex.uni ? sidesHTML(day, ei, o, k, v) : `<div class="nums">
-      <label class="field"><span>Kg</span><input id="${k}-kg" inputmode="decimal" value="${esc(v.kg??"")}" placeholder="—"></label>
+    ${ex.uni ? sidesHTML(day, ei, o, k, v) : `<div class="nums${repsOnly(ex) ? " ro" : ""}">
+      ${repsOnly(ex) ? "" : `<label class="field"><span>Kg</span><input id="${k}-kg" inputmode="decimal" value="${esc(v.kg??"")}" placeholder="—"></label>`}
       <label class="field"><span>Reps</span><input id="${k}-reps" inputmode="numeric" value="${esc(v.reps??"")}" placeholder="—"></label>
       ${lastHTML(lastFor(day.id, ei, s.type, o.ord, ex.name))}
       <button class="check" aria-label="Marcar serie como hecha" aria-pressed="${!!v.done}">✓</button>
@@ -2291,7 +2295,8 @@ function progressFeedback(day){
   const out = [];
   exs(day).forEach((ex,ei) => {
     const o = setsOf(day,ex,ei).find(x => x.s.type === "top"); if (!o) return;
-    const v = log[o.k] || {}, l = lastFor(day.id, ei, "top", 0, ex.name);
+    let v = log[o.k] || {}, l = lastFor(day.id, ei, "top", 0, ex.name);
+    if (repsOnly(ex)){ v = { ...v, kg: hasVal(v.reps) ? 0 : v.kg }; if (l) l = { ...l, kg: hasVal(l.reps) ? 0 : l.kg }; }
     const tmin = parseInt(String(o.s.target)) || null;
     const sides = ex.uni ? [["D","kg","reps"],["I","kgL","repsL"]] : [["","kg","reps"]];
     const parts = sides.map(([lab, kf, rf]) => {
