@@ -2422,19 +2422,22 @@ function entryText(e){
 /* Botones de compartir (imagen, PDF, WhatsApp, copiar) sobre un informe ya montado */
 function wireShare(sh, e, onShared){
   const cl = CLIENTS[code], note = sh.querySelector("#share-note"), TXT = entryText(e);
-  const imgBtn = sh.querySelector("#img");
+  const imgBtn = sh.querySelector("#img"), altBtn = sh.querySelector("#imgalt");
+  /* Plan B si WhatsApp (u otra app) da error al recibirla: abrir la imagen para guardarla con pulsación larga */
+  altBtn.onclick = () => { if (rep) showReportImage(rep.blob); };
   const slug = t => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const d0 = new Date(e.ts), ds = `${d0.getFullYear()}-${String(d0.getMonth()+1).padStart(2,"0")}-${String(d0.getDate()).padStart(2,"0")}`;
   const base = `CristianEntrenador_${slug(cl.name)}_${slug(e.dayLabel.split("·")[0])}_${ds}`;
   let rep = null;
   reportRender(sh.querySelector(".paper")).then(r => {
     rep = r; imgBtn.disabled = false; imgBtn.textContent = "🖼️ Compartir imagen con Cristian";
+    altBtn.hidden = false;
   }).catch(() => {
     imgBtn.textContent = "No se pudo crear la imagen"; note.textContent = "Haz una captura de pantalla del informe y mándasela a Cristian.";
   });
   imgBtn.onclick = async () => {
     if (!rep) return;
-    const out = await shareFile(new File([rep.blob], base + ".png", { type: "image/png" }));
+    const out = await shareFile(new File([rep.blob], base + ".jpg", { type: "image/jpeg" }));
     /* Compartida: se cierra sola (y vuelve al inicio al terminar sesión), sin tener que tocar "Listo" */
     if (out === "shared"){
       if (onShared){ onShared(); toast("Imagen compartida ✓ ¡Buen entreno!"); }
@@ -2446,6 +2449,7 @@ function wireShare(sh, e, onShared){
 const shareButtons = (noteTxt, extra) => `<div class="share-row">
       <button class="btn" id="img" disabled>Preparando la imagen…</button>
       <p class="note" id="share-note">${noteTxt}</p>
+      <button class="undo" id="imgalt" hidden>¿No te deja compartir? Ver imagen para guardarla</button>
       <button class="ghost" id="close">Listo</button>${extra || ""}
     </div>`;
 
@@ -2524,7 +2528,7 @@ async function reportRender(paper){
        Solo copiamos el informe: fuera fotos, vídeos e iframes que no son del informe. */
     const skip = el => /^(IMG|IFRAME|VIDEO)$/.test(el.tagName) && !clone.contains(el);
     const canvas = await limit(html2canvas(clone, { scale: 2.5, backgroundColor: "#fbfaf7", logging: false, ignoreElements: skip }), 20000);
-    const blob = await limit(new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error("sin imagen")), "image/png")), 10000);
+    const blob = await limit(new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error("sin imagen")), "image/jpeg", 0.92)), 10000);
     return { canvas, blob };
   } finally { box.remove(); }
 }
@@ -2538,7 +2542,8 @@ function reportPdf(canvas){
 /* Abre el menú de compartir del móvil (Guardar en Fotos, WhatsApp…); si no existe, descarga el archivo */
 async function shareFile(file){
   if (navigator.canShare && navigator.share && navigator.canShare({ files: [file] })){
-    try { await navigator.share({ files: [file], title: "Informe CristianEntrenador" }); return "shared"; }
+    /* Solo el archivo, sin título: en Android, WhatsApp a veces da error si llega imagen + texto */
+    try { await navigator.share({ files: [file] }); return "shared"; }
     catch(e){ if (e && e.name === "AbortError") return "cancel"; return "fallback"; }
   }
   if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return "fallback";
