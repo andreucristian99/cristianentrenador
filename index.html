@@ -653,6 +653,19 @@ function renderLogin(){
 
 let view = "home", hist = [], progEx = null, progMetric = "top", crea = {}, creaMonth = 0, creaOpen = false;
 
+/* Máquinas que cambiaron de nombre: los entrenos viejos pasan al nombre nuevo,
+   así no se pierde la "última vez" ni la gráfica de progreso de ese ejercicio */
+const RENAMED = {
+  "Press plano en máquina de placas (al lado de los aductores)": "Press plano en máquina de placas (al lado de prensa horizontal)"
+};
+function applyRenames(h){
+  let n = 0;
+  (h || []).forEach(e => {
+    (e.exercises || []).forEach(x => { if (RENAMED[x.name]){ x.name = RENAMED[x.name]; n++; } });
+    (e.fb || []).forEach(x => { if (RENAMED[x.name]){ x.name = RENAMED[x.name]; n++; } });
+  });
+  return n;
+}
 function login(c){
   code = c; store.set("ce-code", c);
   if (!store.get(P + "-synced-" + c)){ store.set(P + "-synced-" + c, []); store.set(P + "-keysdirty-" + c, Date.now()); }
@@ -665,6 +678,7 @@ function login(c){
     hist = hist.filter(e => !e.seed && !e.imported).concat(seedHistory(c)).sort((a,b) => a.ts - b.ts);
     saveHist(); store.set("ce-seedver-" + c, ver);
   }
+  if (applyRenames(hist)) store.set("ce-hist-" + c, hist);
   mySetup = store.get("ce-setup-" + c) || {};
   crea = store.get("ce-crea-" + c) || {}; creaMonth = 0; creaOpen = false;
   /* Si Android cerró la página al bloquear el móvil, vuelve a la misma pantalla, día y posición */
