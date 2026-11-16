@@ -766,7 +766,7 @@ const hasVal = x => x != null && x !== "";
 /* Texto kg × reps; en unilaterales "D 12,5×10 · I 12,5×11" */
 function kgx(v, uni){
   const one = (kg, r) => !(hasVal(kg) && +kg) && hasVal(r) ? `${r} reps` : `${hasVal(kg) ? fmt(+kg) : "—"} kg × ${hasVal(r) ? r : "—"}`;
-  if (!uni) return one(v.kg, v.reps);
+  if (!uni || (v.kgL === undefined && v.repsL === undefined)) return one(v.kg, v.reps);
   return `D ${one(v.kg, v.reps)} · I ${one(v.kgL, v.repsL)}`;
 }
 function entryVol(e){
@@ -805,7 +805,8 @@ function lastFor(dayId, ei, type, ord, name){
 }
 const shortDate = ts => new Date(ts).toLocaleDateString("es-ES", {day:"numeric", month:"short"}).replace(".", "");
 function lastHTML(l, side){
-  if (l && side === "L") l = hasVal(l.kgL) && hasVal(l.repsL) ? { ...l, kg: l.kgL, reps: l.repsL } : null;
+  /* Si esa vez se apuntó sin separar por lado (antes de ser unilateral), vale lo mismo para el izquierdo */
+  if (l && side === "L") l = hasVal(l.kgL) && hasVal(l.repsL) ? { ...l, kg: l.kgL, reps: l.repsL } : (l.kgL === undefined && l.repsL === undefined && hasVal(l.reps) ? l : null);
   else if (l && !hasVal(l.reps)) l = null;
   if (!l) return `<div class="last"><span class="last-lab">Última vez</span><span class="last-v">Sin registro aún</span></div>`;
   return `<div class="last"><span class="last-lab">Última vez · ${esc(shortDate(l.ts))}</span><span class="last-v num">${hasVal(l.kg) && +l.kg ? `${esc(fmt(l.kg))} kg × ${esc(l.reps)}` : `${esc(l.reps)} reps`}</span>${l.rpe != null ? `<span class="last-x num">RPE ${esc(l.rpe)}</span>` : l.rir != null ? `<span class="last-x num">RPE —</span>` : ""}</div>`;
