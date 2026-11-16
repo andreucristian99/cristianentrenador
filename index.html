@@ -246,7 +246,8 @@ button{cursor:pointer}
 .checkin[aria-pressed="true"] .box{background:var(--ok);border-color:var(--ok);color:var(--bg)}
 .checkin[aria-pressed="true"] .ok{opacity:1;transform:none}
 .week7{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:-4px}
-.d7{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:600}
+.d7{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:600;background:none;border:0;padding:0;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.week7-hint{font-size:12px;color:var(--muted);margin-top:-2px}
 .d7 i{width:100%;max-width:34px;aspect-ratio:1;border-radius:9px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:13px;color:var(--bg);font-weight:900}
 .d7.on i{background:var(--ok);border-color:var(--ok)}
 .d7.now{color:var(--fg)}
@@ -1101,7 +1102,7 @@ function creaHomeHTML(now){
   const tk = dayKey(now), took = !!crea[tk];
   const days7 = Array.from({length:7}, (_,i) => { const d = new Date(now); d.setDate(d.getDate() - (6 - i)); return d; });
   const week = days7.map(d => { const k = dayKey(d), on = !!crea[k];
-    return `<div class="d7${on?" on":""}${k===tk?" now":""}"><i>${on?"✓":""}</i>${d.toLocaleDateString("es-ES",{weekday:"short"}).replace(".","").slice(0,2)}</div>`; }).join("");
+    return `<button type="button" class="d7${on?" on":""}${k===tk?" now":""}" data-k="${k}" aria-pressed="${on}" aria-label="${d.toLocaleDateString("es-ES",{weekday:"long", day:"numeric"})}"><i>${on?"✓":""}</i>${d.toLocaleDateString("es-ES",{weekday:"short"}).replace(".","").slice(0,2)}</button>`; }).join("");
   const st = creaStreak();
   return `<div class="blk-title">Check-in de hoy</div>
     <button class="checkin" id="crea" aria-pressed="${took}">
@@ -1110,6 +1111,7 @@ function creaHomeHTML(now){
       <span class="ok" aria-hidden="true">OK</span>
     </button>
     <div class="week7" aria-label="Creatina últimos 7 días">${week}</div>
+    <div class="week7-hint">¿Te olvidaste de marcar algún día? Toca ese día aquí arriba.</div>
     <div class="streak">${st > 1 ? `Racha: <b>${st} días seguidos</b> 🔥` : st === 1 ? "Racha: <b>1 día</b>. ¡A por el segundo!" : "Empieza tu racha hoy."}</div>
 `;
 }
@@ -1162,6 +1164,12 @@ function renderHome(){
     store.set("ce-crea-" + code, crea); markKeys();
     const y = window.scrollY; renderHome(); window.scrollTo(0, y);
   };
+  app.querySelectorAll(".week7 .d7").forEach(b => b.onclick = () => {
+    const k = b.dataset.k;
+    if (crea[k]) delete crea[k]; else crea[k] = Date.now();
+    store.set("ce-crea-" + code, crea); markKeys();
+    const y = window.scrollY; renderHome(); window.scrollTo(0, y);
+  });
   document.getElementById("go-train").onclick = () => { dayIdx = ni; view = "train"; render(); window.scrollTo(0,0); };
   app.querySelectorAll(".alt-b").forEach(b => b.onclick = () => { dayIdx = +b.dataset.i; view = "train"; render(); window.scrollTo(0,0); });
 }
