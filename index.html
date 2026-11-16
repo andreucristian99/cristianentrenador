@@ -695,7 +695,7 @@ function login(c){
     saveHist(); store.set("ce-seedver-" + c, ver);
   }
   if (applyRenames(hist)) store.set("ce-hist-" + c, hist);
-  mySetup = store.get("ce-setup-" + c) || {};
+  mySetup = fixSetups(c, store.get("ce-setup-" + c) || {});
   crea = store.get("ce-crea-" + c) || {}; creaMonth = 0; creaOpen = false;
   /* Si Android cerró la página al bloquear el móvil, vuelve a la misma pantalla, día y posición */
   const pos = store.get("ce-pos-" + c);
@@ -933,7 +933,27 @@ function loadShort(panel){
 function unloadShort(panel){ panel.querySelectorAll(".short.on").forEach(el => { el.classList.remove("on"); el.innerHTML = ""; }); }
 
 /* ---------- Setup editable por el cliente ---------- */
-function setupKey(day, ei){ return `${day.id}-${ei}${sfx(day, ei)}`; }
+/* El setup va por nombre del ejercicio (día + nombre de la opción elegida), así no se mueve si Cristian reordena la rutina */
+function setupKey(day, ei){ return `${day.id}:${eff(day, ei).name}`; }
+/* Pasa los setups antiguos (guardados por posición, "U1-3" o "U1-3b") a nombre. Antes aplica, una sola vez,
+   la corrección que Cristian ponga en la rutina (setupFix) si algún setup quedó en otro ejercicio al reordenar */
+function fixSetups(c, s){
+  const cl = CLIENTS[c]; let ch = false; s = { ...s };
+  const fx = cl && cl.setupFix;
+  if (fx && fx.id && store.get(P + "-setupfix-" + c) !== fx.id){
+    (fx.del || []).forEach(k => { delete s[k]; });
+    Object.assign(s, fx.set || {});
+    store.set(P + "-setupfix-" + c, fx.id); ch = true;
+  }
+  Object.keys(s).forEach(k => {
+    const m = k.match(/^(.+)-(\d+)(b?)$/); if (!m || !cl) return;
+    const day = cl.days.find(d => d.id === m[1]), ex0 = day && day.exercises[+m[2]], x = ex0 && (m[3] ? ex0.alt : ex0);
+    if (x){ const nk = `${m[1]}:${x.name}`; if (s[nk] == null) s[nk] = s[k]; }
+    delete s[k]; ch = true;
+  });
+  if (ch){ store.set(P + "-setup-" + c, s); markKeys(); }
+  return s;
+}
 function setupInner(day, ex, ei){
   const k = setupKey(day, ei), mine = mySetup[k], shown = mine != null ? mine : ex.setup;
   if (!shown) return `<button class="setup-add" data-act="edit">+ Añadir setup</button>`;
