@@ -532,7 +532,7 @@ function cacheClient(c, cl){ CLIENTS[c] = cl; store.set(P + "-client-" + c, cl);
 function mergeBackup(c, b){
   if (!b) return;
   let h = store.get(P + "-hist-" + c);
-  if (!Array.isArray(h)){ h = seedHistory(c); store.set(P + "-seedver-" + c, CLIENTS[c].seedVer || 0); }
+  if (!Array.isArray(h)){ h = seedHistory(c); store.set(P + "-seedver-" + c, seedVerOf(c)); }
   const have = new Set(h.map(sid)), dels = new Set(store.get(P + "-deleted-" + c) || []);
   const synced = new Set(store.get(P + "-synced-" + c) || []);
   (b.sessions || []).forEach(e => { const id = sid(e); synced.add(id); if (!have.has(id) && !dels.has(id)) h.push(e); });
@@ -667,16 +667,31 @@ function applyRenames(h){
   });
   return n;
 }
+/* Versión de la "última vez" cargada: cambia sola si Cristian cambia la rutina (ejercicios o datos de la semana anterior) */
+function seedVerOf(c){
+  const cl0 = CLIENTS[c], fp = JSON.stringify([cl0.lastWeek || "", cl0.fresh ? 1 : 0, (cl0.days || []).map(d => [d.id, d.lastWeek || "", d.exercises.map(x => [x.name, x.sets.map(s => s.prev || ""), x.alt ? [x.alt.name, x.alt.sets.map(s => s.prev || "")] : 0])])]);
+  let h = 0; for (let i = 0; i < fp.length; i++) h = (h * 31 + fp.charCodeAt(i)) | 0;
+  return (cl0.seedVer || 0) + ":" + h;
+}
+/* Al recargar la semana del Excel, va siempre antes que los entrenos reales (para no tapar la última vez real) */
+function reseed(c, h){
+  const real = h.filter(e => !e.seed && !e.imported), seed = seedHistory(c);
+  if (real.length && seed.length){
+    const first = Math.min(...real.map(e => e.ts)), shift = Math.max(...seed.map(e => e.ts)) - first + 864e5;
+    if (shift > 0) seed.forEach(e => e.ts -= shift);
+  }
+  return real.concat(seed).sort((a,b) => a.ts - b.ts);
+}
 function login(c){
   code = c; store.set("ce-code", c);
   if (!store.get(P + "-synced-" + c)){ store.set(P + "-synced-" + c, []); store.set(P + "-keysdirty-" + c, Date.now()); }
   queueSync(2500);
   log = store.get("ce-log-" + c) || {};
   hist = store.get("ce-hist-" + c);
-  const ver = CLIENTS[c].seedVer || 0;
+  const ver = seedVerOf(c);
   if (!Array.isArray(hist)) { hist = seedHistory(c); saveHist(); store.set("ce-seedver-" + c, ver); }
   else if ((store.get("ce-seedver-" + c) || 0) !== ver){
-    hist = hist.filter(e => !e.seed && !e.imported).concat(seedHistory(c)).sort((a,b) => a.ts - b.ts);
+    hist = reseed(c, hist);
     saveHist(); store.set("ce-seedver-" + c, ver);
   }
   if (applyRenames(hist)) store.set("ce-hist-" + c, hist);
