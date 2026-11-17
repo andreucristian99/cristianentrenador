@@ -667,6 +667,21 @@ function applyRenames(h){
   });
   return n;
 }
+/* Corrección de una serie mal apuntada: Cristian la pone en la rutina (histFix) y se aplica una sola vez
+   en el historial del móvil. Ej.: [{ id:"f1", s:"<id sesión>", ex:"<ejercicio>", set:1, kg:"39" }] (set empieza en 0) */
+function fixHist(c, h){
+  const cl = CLIENTS[c], fx = cl && cl.histFix; if (!Array.isArray(fx) || !fx.length) return 0;
+  const done = new Set(store.get(P + "-histfix-" + c) || []); let n = 0;
+  fx.forEach(f => {
+    if (!f || !f.id || done.has(f.id)) return;
+    const e = (h || []).find(x => sid(x) === String(f.s)), x = e && (e.exercises || []).find(y => y.name === f.ex);
+    const st = x && x.sets && x.sets[f.set];
+    if (st){ if (f.kg != null) st.kg = String(f.kg); if (f.reps != null) st.reps = String(f.reps); n++; }
+    done.add(f.id);
+  });
+  store.set(P + "-histfix-" + c, [...done]);
+  return n;
+}
 /* Versión de la "última vez" cargada: cambia sola si Cristian cambia la rutina (ejercicios o datos de la semana anterior) */
 function seedVerOf(c){
   const cl0 = CLIENTS[c], fp = JSON.stringify([cl0.lastWeek || "", cl0.fresh ? 1 : 0, (cl0.days || []).map(d => [d.id, d.lastWeek || "", d.exercises.map(x => [x.name, x.sets.map(s => s.prev || ""), x.alt ? [x.alt.name, x.alt.sets.map(s => s.prev || "")] : 0])])]);
@@ -695,6 +710,7 @@ function login(c){
     saveHist(); store.set("ce-seedver-" + c, ver);
   }
   if (applyRenames(hist)) store.set("ce-hist-" + c, hist);
+  if (fixHist(c, hist)) store.set("ce-hist-" + c, hist);
   mySetup = fixSetups(c, store.get("ce-setup-" + c) || {});
   crea = store.get("ce-crea-" + c) || {}; creaMonth = 0; creaOpen = false;
   /* Si Android cerró la página al bloquear el móvil, vuelve a la misma pantalla, día y posición */
