@@ -651,8 +651,12 @@ async function autoSend(sh, e, rep, base, who){
   let ok = false;
   try { ok = await sendReport(e, rep.canvas, base); } catch(err){}
   st.className = "send-st " + (ok ? "ok" : "wait");
+  if (!ok){
+    imgBtn.className = "btn"; imgBtn.textContent = `📤 Plan B: mandársela a ${who} por WhatsApp`;
+    const alt = sh.querySelector("#imgalt"); if (alt) alt.hidden = false;
+  }
   st.textContent = ok ? `✓ Tranqui, ${who} ya tiene guardado tu informe. Ahora toca descansar y comer bien, del resto se encarga Cris 💪`
-    : `El informe queda guardado y se le enviará solo a ${who} en cuanto haya conexión ✓`;
+    : `No se pudo enviar ahora. Se volverá a intentar sola, pero para asegurarte usa el plan B de aquí abajo 👇`;
 }
 /* Primera vez con esta versión: el cliente ya tenía su código guardado pero no su rutina */
 function renderLoading(c){
@@ -1673,7 +1677,7 @@ function wireShare(sh, e, onShared){
   const base = `CristianEntrenador_${slug(cl.name)}_${slug(e.dayLabel.split("·")[0])}_${ds}`;
   let rep = null;
   reportRender(sh.querySelector(".paper")).then(r => {
-    rep = r; imgBtn.disabled = false; altBtn.hidden = false;
+    rep = r; imgBtn.disabled = false;
     autoSend(sh, e, rep, base, "Cristian");
   }).catch(() => {
     const st = sh.querySelector("#send-st"); st.className = "send-st wait"; st.textContent = "No se pudo crear la imagen";
