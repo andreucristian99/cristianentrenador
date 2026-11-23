@@ -392,11 +392,14 @@ button{cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* Opción A / B */
 .opt{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:-2px 0 12px}
+.opt.three{grid-template-columns:1fr 1fr 1fr}
 .opt-b{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:8px 6px;font:700 13px/1.15 var(--body);cursor:pointer}
 .opt-b small{display:block;font-weight:500;font-size:10.5px;opacity:.8;margin-top:2px}
 .opt-b[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#1a1205}
 .opt-none{font-size:11.5px;color:var(--muted);margin:-2px 0 10px;letter-spacing:.01em}
-.ex.is-b .ex-name::after{content:"Opción B";display:inline-block;margin-left:8px;font:700 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:3px 5px;vertical-align:middle}
+.ex.is-b .ex-name::after{content:"Opción B"}
+.ex.is-c .ex-name::after{content:"Opción C"}
+.ex.is-b .ex-name::after,.ex.is-c .ex-name::after{display:inline-block;margin-left:8px;font:700 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:3px 5px;vertical-align:middle}
 .next li span{white-space:nowrap}
 .has-b{font-style:normal;font-size:10px;font-weight:700;color:var(--accent);margin-left:4px}
 .rp-opt{font-style:normal;font-size:10px;color:#ff8a3d;text-transform:uppercase;letter-spacing:.06em}
@@ -529,14 +532,17 @@ function rpeRead(rpe, tr){
 /* ---------- Opción A / B ----------
    Si la máquina está ocupada, el atleta cambia a la opción B: mismo patrón de movimiento, mismo orden.
    Cada opción guarda sus series por separado y su "última vez" sale de su propio historial. */
-function optOf(day, ei){ return day.exercises[ei].alt && log[`${day.id}-${ei}-opt`] === "B" ? "B" : "A"; }
+/* Opción C (alt2): tercera opción si A y B están ocupadas */
+function optOf(day, ei){ const ex = day.exercises[ei], o = log[`${day.id}-${ei}-opt`]; return ex.alt2 && o === "C" ? "C" : ex.alt && o === "B" ? "B" : "A"; }
 function eff(day, ei){
   const ex = day.exercises[ei];
-  if (optOf(day, ei) !== "B") return { ...ex, opt: ex.alt ? "A" : null };
-  return { ...ex, ...ex.alt, cues: ex.alt.cues || ex.cues, memo: ex.alt.memo || ex.memo, alt: undefined, opt: "B" };
+  const o = optOf(day, ei);
+  if (o === "A") return { ...ex, opt: ex.alt || ex.alt2 ? "A" : null };
+  const x = o === "C" ? ex.alt2 : ex.alt;
+  return { ...ex, ...x, cues: x.cues || ex.cues, memo: x.memo || ex.memo, alt: undefined, alt2: undefined, opt: o };
 }
 const exs = day => day.exercises.map((_, ei) => eff(day, ei));
-const sfx = (day, ei) => optOf(day, ei) === "B" ? "b" : "";
+const sfx = (day, ei) => ({ B:"b", C:"c" })[optOf(day, ei)] || "";
 
 /* ---------- Estado ---------- */
 let code = null, dayIdx = 0, log = {}, fails = 0, lockUntil = 0, mySetup = {};
@@ -767,13 +773,20 @@ function applyRenames(h){
   return n;
 }
 /* Corrección de una serie mal apuntada: Cristian la pone en la rutina (histFix) y se aplica una sola vez
-   en el historial del móvil. Ej.: [{ id:"f1", s:"<id sesión>", ex:"<ejercicio>", set:1, kg:"39" }] (set empieza en 0) */
+   en el historial del móvil. Ej.: [{ id:"f1", s:"<id sesión>", ex:"<ejercicio>", set:1, kg:"39" }] (set empieza en 0)
+   o [{ id:"f2", s:"<id sesión>", ex:"<ejercicio>", repl:{ name, opt, sets:[...] } }] para cambiar el ejercicio entero */
 function fixHist(c, h){
   const cl = CLIENTS[c], fx = cl && cl.histFix; if (!Array.isArray(fx) || !fx.length) return 0;
   const done = new Set(store.get(P + "-histfix-" + c) || []); let n = 0;
   fx.forEach(f => {
     if (!f || !f.id || done.has(f.id)) return;
     const e = (h || []).find(x => sid(x) === String(f.s)), x = e && (e.exercises || []).find(y => y.name === f.ex);
+    if (f.repl && !e) return; /* esa sesión aún no está en el móvil (se recupera de la hoja): se aplica cuando llegue */
+    /* repl: sustituye el ejercicio entero de esa sesión (nombre, opción y series), ej. si se apuntó en otra opción */
+    if (x && f.repl && Array.isArray(f.repl.sets)){
+      x.name = f.repl.name || x.name; if (f.repl.opt) x.opt = f.repl.opt; else delete x.opt;
+      x.sets = f.repl.sets.map(z => ({ ...z })); delete e.fb; n++; done.add(f.id); return;
+    }
     const st = x && x.sets && x.sets[f.set];
     if (st){ if (f.kg != null) st.kg = String(f.kg); if (f.reps != null) st.reps = String(f.reps); n++; }
     done.add(f.id);
@@ -783,7 +796,7 @@ function fixHist(c, h){
 }
 /* Versión de la "última vez" cargada: cambia sola si Cristian cambia la rutina (ejercicios o datos de la semana anterior) */
 function seedVerOf(c){
-  const cl0 = CLIENTS[c], fp = JSON.stringify([cl0.lastWeek || "", cl0.fresh ? 1 : 0, (cl0.days || []).map(d => [d.id, d.lastWeek || "", d.exercises.map(x => [x.name, x.sets.map(s => s.prev || ""), x.alt ? [x.alt.name, x.alt.sets.map(s => s.prev || "")] : 0])])]);
+  const cl0 = CLIENTS[c], fp = JSON.stringify([cl0.lastWeek || "", cl0.fresh ? 1 : 0, (cl0.days || []).map(d => [d.id, d.lastWeek || "", d.exercises.map(x => [x.name, x.sets.map(s => s.prev || ""), x.alt ? [x.alt.name, x.alt.sets.map(s => s.prev || "")] : 0].concat(x.alt2 ? [[x.alt2.name]] : []))])]);
   let h = 0; for (let i = 0; i < fp.length; i++) h = (h * 31 + fp.charCodeAt(i)) | 0;
   return (cl0.seedVer || 0) + ":" + h;
 }
@@ -980,7 +993,7 @@ function renderSession(){
   });
   const keepScroll = fn => { const y = window.scrollY; fn(); save(); renderSession(); window.scrollTo(0, y); };
   app.querySelectorAll(".opt-b").forEach(b => b.onclick = () => keepScroll(() => {
-    const k = `${day.id}-${b.dataset.ei}-opt`; if (b.dataset.o === "B") log[k] = "B"; else delete log[k]; }));
+    const k = `${day.id}-${b.dataset.ei}-opt`; if (b.dataset.o === "B" || b.dataset.o === "C") log[k] = b.dataset.o; else delete log[k]; }));
   app.querySelectorAll(".add-aprox").forEach(b => b.onclick = () => keepScroll(() => {
     const kn = `${day.id}-${b.dataset.ei}${sfx(day, +b.dataset.ei)}-xn`; log[kn] = (+log[kn] || 0) + 1; }));
   app.querySelectorAll(".del-x").forEach(b => b.onclick = () => keepScroll(() => {
@@ -1116,9 +1129,11 @@ function setupPdf(day, ex, ei){
 
 function optHTML(day, ex, ei){
   if (!day.exercises[ei].alt){ if (day.home) return ""; return `<div class="opt-none">Sin opción B: si está ocupada, espera a que se libere</div>`; }
-  return `<div class="opt" role="group" aria-label="Opción del ejercicio">
-    <button class="opt-b" data-ei="${ei}" data-o="A" aria-pressed="${ex.opt !== "B"}">Opción A</button>
-    <button class="opt-b" data-ei="${ei}" data-o="B" aria-pressed="${ex.opt === "B"}">Opción B<small>si la A está ocupada</small></button>
+  const c = !!day.exercises[ei].alt2;
+  return `<div class="opt${c ? " three" : ""}" role="group" aria-label="Opción del ejercicio">
+    <button class="opt-b" data-ei="${ei}" data-o="A" aria-pressed="${ex.opt !== "B" && ex.opt !== "C"}">Opción A</button>
+    <button class="opt-b" data-ei="${ei}" data-o="B" aria-pressed="${ex.opt === "B"}">Opción B<small>si la A está ocupada</small></button>${c ? `
+    <button class="opt-b" data-ei="${ei}" data-o="C" aria-pressed="${ex.opt === "C"}">Opción C<small>si A y B están ocupadas</small></button>` : ""}
   </div>`;
 }
 /* ¿Hay que grabarse? "rec": "top" (solo top set, verde) o "topbo" (top set y back-off, naranja) */
@@ -1126,7 +1141,7 @@ const recOf = ex => ex && (ex.rec === "top" || ex.rec === "topbo") ? ex.rec : ""
 const recChip = ex => { const r = recOf(ex); return r ? `<div class="rec ${r}">🎥 ${r === "top" ? "Grábate el top set" : "Grábate el top set y el back-off"}</div>` : ""; };
 const recSet = (ex, s, o) => { const r = recOf(ex); return !!r && !(o && o.extra) && (s.type === "top" || (r === "topbo" && s.type === "bo")); };
 function exCard(day, ex, ei){
-  return `<article class="ex${ex.opt === "B" ? " is-b" : ""}${recOf(ex) ? " rec-" + recOf(ex) : ""}">
+  return `<article class="ex${ex.opt === "B" ? " is-b" : ex.opt === "C" ? " is-c" : ""}${recOf(ex) ? " rec-" + recOf(ex) : ""}">
     ${optHTML(day, ex, ei)}
     <div class="ex-head">
       <div><div class="ex-idx">${String(ei+1).padStart(2,"0")}</div><div class="ex-name">${esc(ex.name)}</div>${recChip(ex)}${ex.meta ? `<div class="ex-meta">${esc(ex.meta)}</div>` : ""}${(ex.memo || []).map(m => `<div class="memo"><b>Nota:</b> ${esc(m)}</div>`).join("")}${setupBlock(day, ex, ei)}</div>
@@ -1179,7 +1194,7 @@ function setRow(day, ex, ei, o, canDel){
 /* Unilaterales: selector derecho / izquierdo (Brazo por defecto, o ex.limb p. ej. "Pierna"), cada lado con su kg y reps */
 function sidesHTML(day, ei, o, k, v){
   const limb = day.exercises[ei].limb || "Brazo", g = limb === "Pierna" ? "a" : "o";
-  const cur = v.side === "L" ? "L" : "R", l = lastFor(day.id, ei, o.s.type, o.ord, day.exercises[ei].alt ? eff(day, ei).name : null);
+  const cur = v.side === "L" ? "L" : "R", l = lastFor(day.id, ei, o.s.type, o.ord, (day.exercises[ei].alt || day.exercises[ei].alt2) ? eff(day, ei).name : null);
   const mini = (kg, r) => hasVal(kg) || hasVal(r) ? `${hasVal(kg) ? fmt(+kg) : "—"}×${hasVal(r) ? r : "—"}` : "";
   const blk = (sd, kf, rf) => `<div class="nums" data-side="${sd}"${cur === sd ? "" : " hidden"}>
       <label class="field"><span>Kg</span><input id="${k}-${kf}" inputmode="decimal" value="${esc(v[kf]??"")}" placeholder="—"></label>
@@ -1302,7 +1317,7 @@ function renderHome(){
     <div class="next">
       <div><div class="n-day">${esc(nd.label)}</div><div class="n-meta">${lastTxt}</div></div>
       <div class="vibe">${vibe}</div>
-      <ul>${nd.exercises.map(ex => `<li><div>${esc(ex.name)}${ex.alt ? ` <em class="has-b">A/B</em>` : ""}</div><span>${(n => n + (n === 1 ? " serie" : " series"))(ex.sets.filter(s=>s.type!=="aprox").length)}</span></li>`).join("")}</ul>
+      <ul>${nd.exercises.map(ex => `<li><div>${esc(ex.name)}${ex.alt ? ` <em class="has-b">${ex.alt2 ? "A/B/C" : "A/B"}</em>` : ""}</div><span>${(n => n + (n === 1 ? " serie" : " series"))(ex.sets.filter(s=>s.type!=="aprox").length)}</span></li>`).join("")}</ul>
       <button class="btn" id="go-train">Empezar entreno</button>
       ${others.length ? `<div class="alt">¿Hoy te viene mejor otro? ${others.map(x => `<button class="alt-b" data-i="${x.i}">${esc(x.d.label)}</button>`).join("")}</div>` : ""}
     </div>
@@ -1359,7 +1374,7 @@ function creaHistHTML(){
 /* ---------- Historial y progreso ---------- */
 function allExercises(){
   const seen = new Set(), out = [];
-  CLIENTS[code].days.forEach(d => d.exercises.filter(ex => !ex.check).forEach(ex => [ex, ex.alt].forEach(x => { if (x && !seen.has(x.name)){ seen.add(x.name); out.push(x.name); } })));
+  CLIENTS[code].days.forEach(d => d.exercises.filter(ex => !ex.check).forEach(ex => [ex, ex.alt, ex.alt2].forEach(x => { if (x && !seen.has(x.name)){ seen.add(x.name); out.push(x.name); } })));
   return out;
 }
 /* Por sesión: top set (o la serie efectiva más pesada si no hay top) y volumen efectivo del ejercicio */
@@ -1561,7 +1576,7 @@ function entryFeedback(e){
       const s = px.sets.filter(x => x.type === "top")[0];
       if (s && s.done && ((s.kg !== "" && s.reps !== "") || (hasVal(s.kgL) && hasVal(s.repsL)))) l = s;
     }
-    const def = dayDef[ei] ? (ex.opt === "B" && dayDef[ei].alt ? dayDef[ei].alt : dayDef[ei]) : null;
+    const def = dayDef[ei] ? (ex.opt === "B" && dayDef[ei].alt ? dayDef[ei].alt : ex.opt === "C" && dayDef[ei].alt2 ? dayDef[ei].alt2 : dayDef[ei]) : null;
     const ts0 = def ? def.sets.find(s => s.type === "top") : null;
     const tmin = ts0 ? parseInt(String(ts0.target)) || null : null;
     const sides = entryUni(ex) ? [["D","kg","reps"],["I","kgL","repsL"]] : [["","kg","reps"]];
@@ -1588,10 +1603,10 @@ const agoTxt = n => n === 0 ? "hoy" : n === 1 ? "ayer" : `hace ${n} días`;
 /* Definición pautada del ejercicio (para sacar el objetivo de reps en sesiones antiguas) */
 function rpDef(e, ei, ex){
   const day = CLIENTS[code].days.find(d => d.id === e.dayId); if (!day) return null;
-  const is = d => d && (d.name === ex.name || (d.alt && d.alt.name === ex.name));
+  const is = d => d && (d.name === ex.name || (d.alt && d.alt.name === ex.name) || (d.alt2 && d.alt2.name === ex.name));
   const d = is(day.exercises[ei]) ? day.exercises[ei] : day.exercises.find(is);
   if (!d) return null;
-  return d.alt && d.name !== ex.name ? d.alt : d;
+  return d.name === ex.name ? d : d.alt && d.alt.name === ex.name ? d.alt : d.alt2;
 }
 const rpTarget = (v, def) => v.target || (def && (def.sets.find(s => s.type === v.type) || {}).target) || "";
 /* Última vez que hizo ESTE ejercicio (en cualquier día de la rutina), antes de esta sesión */
@@ -1625,7 +1640,7 @@ function entryPaper(e){
 
   const blocks = e.exercises.map((ex, ei) => {
     const def = rpDef(e, ei, ex), num = String(ei+1).padStart(2,"0");
-    const nm = `${esc(ex.name)}${ex.opt === "B" ? ` <em class="rp-opt">opción B</em>` : ""}`;
+    const nm = `${esc(ex.name)}${ex.opt === "B" || ex.opt === "C" ? ` <em class="rp-opt">opción ${ex.opt}</em>` : ""}`;
     const noteH = ex.note ? `<p class="rp-note"><b>Nota:</b> ${esc(ex.note)}</p>` : "";
     if (ex.check){
       const ok = ex.sets.some(v => v.done), t = (ex.sets[0] || {}).target, sc = (ex.sets[0] || {}).secs;
@@ -1688,7 +1703,7 @@ function entryText(e){
   if (day.cool && day.cool.length) L.push(`Cardio final: ${e.cool ? "✓ hecho" : "no marcado"}`);
   e.exercises.forEach(ex => {
     const uni = entryUni(ex);
-    L.push("", ex.name.toUpperCase() + (ex.opt === "B" ? " (opción B)" : ""));
+    L.push("", ex.name.toUpperCase() + (ex.opt === "B" || ex.opt === "C" ? ` (opción ${ex.opt})` : ""));
     if (ex.check){ { const sc = (ex.sets[0] || {}).secs; L.push((ex.sets.some(v => v.done) ? "- ✓ Hecho" : "- No marcado") + (sc ? ` · ${sc} s` : "")); } if (ex.note) L.push(`📝 Nota: ${ex.note}`); return; }
     ex.sets.forEach(v => {
       const tr = v.tRir, rd = rpeRead(v.rpe, tr), has = [v.kg, v.reps, v.kgL, v.repsL].some(hasVal);
