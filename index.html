@@ -565,8 +565,19 @@ async function api(body){
   } finally { clearTimeout(t); }
 }
 const sid = e => String(e.id || e.ts);
-function loadCached(c){ const cl = store.get(P + "-client-" + c); if (cl && cl.days) CLIENTS[c] = cl; return !!CLIENTS[c]; }
-function cacheClient(c, cl){ CLIENTS[c] = cl; store.set(P + "-client-" + c, cl); }
+/* Opción C por defecto en VivaGym: a toda "Extensión de cuádriceps (unilateral) con respaldo" con opción B
+   y sin opción C se le añade la máquina de femoral (sin setup: cada cliente apunta el suyo) */
+function withDefaults(cl){
+  (cl && cl.days || []).forEach(d => (d.exercises || []).forEach(ex => {
+    const m = /^Extensión de cuádriceps (unilateral )?con respaldo$/.exec(ex.name || "");
+    if (!m || !ex.alt || ex.alt2) return;
+    ex.alt2 = { name: `Extensión de cuádriceps ${m[1] || ""}máquina de femoral`, img: "fotos/curl-femoral-respaldo.jpg", setup: null,
+      sets: ex.alt.sets.map(s => ({ type: s.type, target: s.target })) };
+  }));
+  return cl;
+}
+function loadCached(c){ const cl = store.get(P + "-client-" + c); if (cl && cl.days) CLIENTS[c] = withDefaults(cl); return !!CLIENTS[c]; }
+function cacheClient(c, cl){ CLIENTS[c] = withDefaults(cl); store.set(P + "-client-" + c, cl); }
 /* Junta la copia de la hoja con lo que ya hay en el móvil, sin borrar nada del móvil */
 function mergeBackup(c, b){
   if (!b) return;
@@ -597,6 +608,7 @@ async function refreshClient(c){
        iPhone que borró datos…), los recupera solos al abrir */
     const r = await api({ action: "login", code: c, withBackup: true });
     if (!r || !r.ok || !r.client) return;
+    withDefaults(r.client);
     const n0 = (store.get(P + "-hist-" + c) || []).length;
     mergeBackup(c, r.backup);
     const gotBack = (store.get(P + "-hist-" + c) || []).length > n0;
